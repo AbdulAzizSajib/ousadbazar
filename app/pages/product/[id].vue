@@ -99,7 +99,7 @@
               <span class="text-3xl font-bold text-[#388072]">
                 ৳{{ Number(productDetail?.selling_price || 0).toFixed(2) }}
               </span>
-              <span
+              <!-- <span
                 v-if="
                   productDetail?.tp &&
                   productDetail?.selling_price &&
@@ -108,7 +108,7 @@
                 class="text-lg text-gray-400 line-through"
               >
                 ৳{{ Number(productDetail?.tp || 0).toFixed(2) }}
-              </span>
+              </span> -->
               <span
                 v-if="
                   productDetail?.tp &&
@@ -188,9 +188,7 @@
                   'opacity-50 cursor-not-allowed':
                     stockQuantity(productDetail) <= 0,
                 }"
-                :disabled="
-                  stockQuantity(productDetail) <= 0
-                "
+                :disabled="stockQuantity(productDetail) <= 0"
                 type="button"
                 class="bg-[#388072] hover:bg-[#2d6a5a] py-4 text-white w-full rounded-xl font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2 text-base shadow-lg shadow-[#388072]/20 active:scale-[0.98]"
                 @click="handleDropdownClick"
@@ -618,14 +616,17 @@ const handleAddToCart = (product, quantity, index) => {
     ...product,
     product_prices: {
       selling_price: product?.selling_price || 0,
-      ecom_final_selling_price: product?.ecom_final_selling_price || product?.selling_price || 0,
+      ecom_final_selling_price:
+        product?.ecom_final_selling_price || product?.selling_price || 0,
       ecom_discount_percentage: product?.ecom_discount_percentage || null,
       pack_quantity: product?.quantity || 1,
     },
     stock_batches: product?.stock_batches || [
       { balanced_quantity: product?.balanced_quantity || 0 },
     ],
-    product_images: product?.product_images || (product?.path ? [{ path: product.path }] : []),
+    product_images:
+      product?.product_images ||
+      (product?.path ? [{ path: product.path }] : []),
   };
   getCart(normalizedProduct, quantity, index);
   dropdownOpen.value = false;
