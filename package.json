@@ -1,40 +1,37 @@
 {
-  "name": "nuxt-app",
+  "name": "ousad-bazar",
+  "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@ant-design-vue/nuxt": "^1.4.6",
-    "@headlessui/vue": "^1.7.23",
-    "@nuxtjs/tailwindcss": "^6.14.0",
-    "@pinia/nuxt": "^0.11.2",
-    "@tailwindcss/typography": "^0.5.18",
-    "ant-design-vue": "^4.2.6",
+    "next": "^15.3.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zustand": "^5.0.5",
     "axios": "^1.11.0",
-    "daisyui": "^5.0.50",
-    "debounce": "^3.0.0",
-    "iconify-icon": "^3.0.0",
-    "js-cookie": "^3.0.5",
-    "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
-    "moment": "^2.30.1",
-    "nuxt": "^4.0.1",
-    "pinia": "^3.0.3",
-    "pinia-plugin-persistedstate": "^4.5.0",
-    "sass": "^1.90.0",
-    "swiper": "^11.2.10",
-    "vue": "^3.5.18",
-    "vue-router": "^4.5.1",
-    "vue3-toastify": "^0.2.8"
+    "@iconify/react": "^5.2.0",
+    "antd": "^5.25.1",
+    "dayjs": "^1.11.13",
+    "sass": "^1.90.0"
   },
   "devDependencies": {
-    "@iconify/vue": "^5.0.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@types/lodash.debounce": "^4.0.9",
+    "typescript": "^5.8.3",
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8.5.3",
+    "autoprefixer": "^10.4.21",
+    "@tailwindcss/typography": "^0.5.18",
+    "daisyui": "^4.12.23",
+    "eslint": "^9.25.1",
+    "eslint-config-next": "^15.3.1"
   }
 }

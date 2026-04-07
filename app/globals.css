@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap");
+
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  overflow-x: hidden;
+  @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+}
+
+.text-primary {
+  color: #388072;
+}
+
+.text-secondary {
+  color: rgb(208, 2, 27);
+}
+
+.bg-primary {
+  background: #388072;
+}
+
+.border-primary {
+  border: 1px solid #388072;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  padding: 0 16px;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.btn-primary {
+  @apply capitalize tracking-widest font-medium text-white bg-[#007c46] py-3 px-10 rounded-full;
+}
+
+/* Active link styles */
+.active-link span {
+  color: #388072 !important;
+  font-weight: 700;
+}
+
+.active-link .relative {
+  background-color: rgba(56, 128, 114, 0.1);
+}
+
+/* Animations */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ant Design overrides */
+.rc-virtual-list-holder {
+  max-height: 450px !important;
+}
+
+.cart-qty-dropdown .rc-virtual-list-holder {
+  max-height: 200px !important;
+}
+
+/* Swiper overrides */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #ffffff !important;
+}
+
+@media (max-width: 768px) {
+  .swiper-button-next,
+  .swiper-button-prev {
+    transform: scale(0.5) !important;
+  }
+}
+
+/* Custom dropdown styles */
+.my-dropdown .ant-dropdown-menu {
+  max-height: 280px !important;
+  overflow-y: auto !important;
+  background-color: #ebf2f0 !important;
+}
+
+/* Scrollbar styles */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
