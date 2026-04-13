@@ -11,10 +11,10 @@ export type CarouselSlide = {
 };
 
 const defaultSlides: CarouselSlide[] = [
-  // { id: 1, image: "/carousel/banner-1.png", alt: "Banner 1" },
-  // { id: 2, image: "/carousel/Banner-2.png", alt: "Banner 2" },
+  { id: 1, image: "/carousel/banner-1.png", alt: "Banner 1" },
+  { id: 2, image: "/carousel/Banner-2.png", alt: "Banner 2" },
   { id: 3, image: "/carousel/Banner-3.png", alt: "Banner 3" },
-  { id: 4, image: "/carousel/Banner-4.png", alt: "Banner 4" },
+
 ];
 
 interface HeroCarouselProps {
@@ -38,7 +38,7 @@ export default function HeroCarousel({
   }, [next, autoPlayInterval, total]);
 
   return (
-    <div className="relative overflow-hidden rounded-lg my-6">
+    <div className="relative overflow-hidden rounded-lg my-3 sm:my-4 md:my-6">
       <div
         className="flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${current * 100}%)` }}
@@ -48,7 +48,7 @@ export default function HeroCarousel({
             <img
               src={slide.image}
               alt={slide.alt || `Slide ${slide.id}`}
-              className="w-full h-[410px] object-cover block"
+              className="block w-full h-[170px] sm:h-[230px] md:h-[300px] lg:h-[410px] object-cover border rounded-sm"
             />
           );
           return (
@@ -60,14 +60,14 @@ export default function HeroCarousel({
       </div>
 
       {total > 1 && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 sm:gap-2">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
               aria-label={`Go to slide ${i + 1}`}
               className={`h-2 rounded-full transition-all ${
-                i === current ? "w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/80"
+                i === current ? "w-5 sm:w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/80"
               }`}
             />
           ))}

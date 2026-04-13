@@ -25,6 +25,7 @@ export default function Header({
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const cartProduct = useCartStore((s) => s.cartProduct);
   const totalPrice = useCartStore((s) => s.totalPrice);
   const searchStore = useSearchStore();
@@ -41,6 +42,18 @@ export default function Header({
       }, 100);
     }
   }, [isSearchPage]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <div className="w-full bg-white sticky top-0 z-50 shadow-sm">
@@ -127,8 +140,12 @@ export default function Header({
                 </span>
 
                 {!isLoggedIn ? (
-                  <button onClick={onShowLoginModal} className="px-5 py-2 bg-[#388072] text-white text-sm font-semibold rounded-lg hover:bg-[#2d6a5a] transition-all duration-300 shadow-md shadow-[#388072]/20 active:scale-95">
-                    Login
+                  <button onClick={onShowLoginModal} className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-all duration-300 active:scale-95">
+                    <Icon icon="solar:user-circle-linear" className="w-8 h-8 text-gray-500" />
+                    <div className="flex flex-col items-start leading-tight">
+                      <span className="text-xs text-gray-500">Hello, Sign in</span>
+                      <span className="text-sm font-semibold text-gray-800">Account & Orders</span>
+                    </div>
                   </button>
                 ) : (
                   <button onClick={onLogout} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 active:scale-95">
@@ -169,8 +186,12 @@ export default function Header({
               </Link>
               <div className="pt-3 px-1">
                 {!isLoggedIn ? (
-                  <button type="button" onClick={onShowLoginModal} className="w-full bg-[#388072] text-white px-4 py-3 rounded-xl font-semibold hover:bg-[#2d6a5a] transition-all duration-300 shadow-md shadow-[#388072]/20 active:scale-[0.98]">
-                    Login
+                  <button type="button" onClick={onShowLoginModal} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl hover:bg-gray-100 transition-all duration-300 active:scale-[0.98]">
+                    <Icon icon="solar:user-circle-linear" className="w-8 h-8 text-gray-500" />
+                    <div className="flex flex-col items-start leading-tight">
+                      <span className="text-xs text-gray-500">Hello, Sign in</span>
+                      <span className="text-sm font-semibold text-gray-800">Account & Orders</span>
+                    </div>
                   </button>
                 ) : (
                   <button onClick={onLogout} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-600 font-semibold hover:bg-red-50 transition-all duration-200">
@@ -215,6 +236,17 @@ export default function Header({
           )}
         </div>
       </nav>
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 p-3 bg-[#388072] text-white rounded-full shadow-lg shadow-[#388072]/30 hover:bg-[#2d6a5a] transition-all duration-300 active:scale-90 animate-bounce-in"
+          aria-label="Scroll to top"
+        >
+          <Icon icon="solar:arrow-up-linear" className="w-6 h-6" />
+        </button>
+      )}
 
       {/* Desktop sub-navigation */}
       {/* <div className="border-y border-[#e8e8e8] py-4 hidden md:block">

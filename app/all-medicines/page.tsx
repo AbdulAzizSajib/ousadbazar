@@ -9,7 +9,7 @@ import type { Product } from "@/types";
 
 export default function AllMedicinesPage() {
   const [sortBy, setSortBy] = useState("asc");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
   const [selectedSuppliers, setSelectedSuppliers] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<number | null>(null);
@@ -88,8 +88,8 @@ export default function AllMedicinesPage() {
     <section className="w-full rounded-lg px-3 md:px-0 py-3">
       <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] xl:grid-cols-[290px_1fr] gap-4">
         {/* Filters Sidebar */}
-        <aside className="md:sticky md:top-[84px] h-fit md:max-h-[calc(100vh-96px)]">
-          <div className="border border-[#d7e9e5] p-4 md:p-5 md:min-h-[calc(100vh-96px)] md:overflow-y-auto">
+        <aside className="h-fit max-h-[78vh] overflow-hidden md:sticky md:top-[84px] md:max-h-[calc(100vh-96px)]">
+          <div className="border border-[#d7e9e5] p-4 md:p-5 max-h-[78vh] overflow-y-auto md:min-h-[calc(100vh-96px)] md:max-h-[calc(100vh-96px)]">
             <div className="flex justify-between items-center mb-3">
               <h2 className="m-0 text-lg md:text-xl font-medium text-[#2b5e55]">Filter Medicines</h2>
               <button type="button" className="border border-[#8fbdb4] text-[#2d6f63] bg-[#ecf6f4] rounded-full px-3.5 py-2 text-sm" onClick={clearFilters}>Clear</button>
