@@ -10,7 +10,7 @@ body {
 }
 
 .text-primary {
-  color: #13a89e;
+  color: #5360A7;
 }
 
 .text-secondary {
@@ -18,11 +18,11 @@ body {
 }
 
 .bg-primary {
-  background: #13a89e;
+  background: #5360A7;
 }
 
 .border-primary {
-  border: 1px solid #13a89e;
+  border: 1px solid #5360A7;
 }
 
 * {

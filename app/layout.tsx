@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import { QueryProviders } from '@/components/QueryProviders';
 import { ClientLayout } from '@/components/ClientLayout';
 import './globals.css';
 import ScrollToTop from '@/components/ScrollToTop';
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const poppins = Poppins({
   subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
 });
 
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" type="image/png" href="/ousadbazar/fav.png" />
       </head>
-      <body className={`${plusJakartaSans.className} bg-[#f9fafb]`}>
+      <body className={`${poppins.className} bg-[#f9fafb]`}>
         <QueryProviders>
           <ClientLayout>
             {children}

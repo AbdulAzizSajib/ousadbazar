@@ -81,7 +81,7 @@ export default function ProductCard({ item }: ProductCardProps) {
               (e.target as HTMLImageElement).src = asset('/images/default.jpg');
             }}
           />
-          <span className="absolute left-2 top-2 rounded-full border border-white/60 bg-white/80 px-2.5 py-0.5 text-[10px] font-medium text-gray-600 backdrop-blur-sm dark:border-gray-600/60 dark:bg-gray-800/80 dark:text-gray-300">
+          <span className="absolute left-2 top-2 rounded-full border border-gray-200 bg-[#F4F5F9] px-2.5 py-0.5 text-[10px] font-medium text-gray-600 backdrop-blur-sm dark:border-gray-600/60 dark:bg-gray-800/80 dark:text-gray-300">
             {categoryName}
           </span>
           {hasDiscount && (
@@ -136,7 +136,7 @@ export default function ProductCard({ item }: ProductCardProps) {
               className={`flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-[12px] font-medium tracking-wide transition-all duration-150
                 ${
                   stock >= 1
-                    ? 'border border-primary text-[#13a89e] hover:bg-[#13a89e] hover:text-white active:scale-[0.98]'
+                    ? 'border border-[#5360A7] text-[#5360A7] hover:bg-[#5360A7] hover:text-white active:scale-[0.98]'
                     : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
                 }`}
             >
@@ -157,7 +157,7 @@ export default function ProductCard({ item }: ProductCardProps) {
               {/* Total price */}
               <div className="flex items-center justify-between px-0.5">
                 <span className="text-[11px] text-gray-400">Total</span>
-                <span className="font-mono text-[13px] font-medium text-[#13a89e] tabular-nums">
+                <span className="font-mono text-[13px] font-medium text-primary tabular-nums">
                   ৳{totalPrice}
                 </span>
               </div>
@@ -165,9 +165,9 @@ export default function ProductCard({ item }: ProductCardProps) {
               <div className="flex items-center justify-between rounded-lg border border-primary overflow-hidden">
                 <button
                   onClick={handleDecrease}
-                  className="flex h-8 w-8 items-center justify-center text-[#13a89e] hover:bg-[#13a89e] hover:text-white transition-colors"
+                  className="flex h-8 w-8 items-center justify-center text-[#5360A7] hover:bg-[#5360A7] hover:text-white transition-colors"
                 >
-                  <Icon icon="mingcute:minus-line" className="h-3.5 w-3.5" />
+                  <Icon icon="tdesign:minus" className="h-3.5 w-3.5" />
                 </button>
                 <span className="flex-1 text-center text-[13px] font-medium text-gray-800 dark:text-gray-100">
                   {quantity}
@@ -175,7 +175,7 @@ export default function ProductCard({ item }: ProductCardProps) {
                 <button
                   onClick={handleIncrease}
                   disabled={quantity >= stock}
-                  className="flex h-8 w-8 items-center justify-center text-[#13a89e] hover:bg-[#13a89e] hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex h-8 w-8 items-center justify-center text-[#5360A7] hover:bg-[#5360A7] hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Icon icon="mingcute:add-line" className="h-3.5 w-3.5" />
                 </button>

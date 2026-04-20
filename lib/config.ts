@@ -2,7 +2,7 @@ export const apiBasePharma = "https://ec.mis.digital/api";
 
 // basePath prefix for static assets in public/ folder.
 // Plain <img> and <link> tags don't get auto-prefixed by Next.js, only next/image does.
-export const basePath = "/ousadbazar";
+export const basePath = "";
 export const asset = (path: string) => `${basePath}${path.startsWith("/") ? path : `/${path}`}`;
 
 export const imgBasePharma =

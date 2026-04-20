@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { ConfigProvider } from "antd";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import CartDrawer from "@/components/CartDrawer";
-import LoginModal from "@/components/LoginModal";
-import { showNotification } from "@/lib/notification";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { ConfigProvider } from 'antd';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import CartDrawer from '@/components/CartDrawer';
+import LoginModal from '@/components/LoginModal';
+import { showNotification } from '@/lib/notification';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -16,14 +16,14 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem("token"));
+    setIsLoggedIn(!!localStorage.getItem('token'));
   }, []);
 
   const handleLogout = () => {
     localStorage.clear();
     setIsLoggedIn(false);
-    showNotification("success", "Logged Out!");
-    router.push("/");
+    showNotification('success', 'Logged Out!');
+    router.push('/');
   };
 
   const handleLoginSuccess = (token: string) => {
@@ -34,7 +34,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: "#388072",
+          colorPrimary: '#388072',
         },
       }}
     >
@@ -53,7 +53,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       </main>
 
       <CartDrawer visible={drawerVisible} onClose={() => setDrawerVisible(false)} />
-      <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} onLoginSuccess={handleLoginSuccess} />
+      <LoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </ConfigProvider>
   );
 }

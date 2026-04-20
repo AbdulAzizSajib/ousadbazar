@@ -11,8 +11,9 @@ export type CarouselSlide = {
 };
 
 const defaultSlides: CarouselSlide[] = [
-  // { id: 1, image: '/carousel/banner-1.png', alt: 'Banner 1' },
-  { id: 3, image: '/carousel/Banner-3.png', alt: 'Banner 3' },
+  { id: 4, image: '/carousel/banner-4.webp', alt: 'Banner 4' },
+  { id: 5, image: '/carousel/Banner-5.webp', alt: 'Banner 5' },
+  { id: 6, image: '/carousel/Banner-6.webp', alt: 'Banner 6' },
 ];
 
 interface HeroCarouselProps {
@@ -36,9 +37,9 @@ export default function HeroCarousel({
   }, [next, autoPlayInterval, total]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 my-3 sm:my-4 md:my-6">
+    <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 ">
       {/* LEFT: Carousel */}
-      <div className="lg:col-span-2 relative overflow-hidden rounded-xl h-[220px] sm:h-[260px] md:h-[320px] lg:h-[420px]">
+      <div className="relative overflow-hidden rounded-xl">
         <div
           className="flex transition-transform duration-700 ease-in-out h-full"
           style={{ transform: `translateX(-${current * 100}%)` }}
@@ -73,43 +74,6 @@ export default function HeroCarousel({
             ))}
           </div>
         )}
-      </div>
-
-      {/* RIGHT: Cards */}
-      <div className="flex flex-col gap-4">
-        {/* Card 1 */}
-        <div className="rounded-2xl p-5 bg-gradient-to-br from-purple-500 to-indigo-500 text-white shadow-md flex flex-col justify-between h-[200px] lg:h-[calc(50%-8px)]">
-          <div>
-            <div className="mb-3 w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-              🧪
-            </div>
-            <h3 className="text-lg font-semibold">Lab Tests at Home</h3>
-            <p className="text-sm text-white/80 mt-1">
-              Sample collection by certified phlebotomists, reports in 24h.
-            </p>
-          </div>
-
-          <button className="mt-4 w-fit px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm">
-            Book now →
-          </button>
-        </div>
-
-        {/* Card 2 */}
-        <div className="rounded-2xl p-5 bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-md flex flex-col justify-between h-[200px] lg:h-[calc(50%-8px)]">
-          <div>
-            <div className="mb-3 w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-              ⬆️
-            </div>
-            <h3 className="text-lg font-semibold">Upload Prescription</h3>
-            <p className="text-sm text-white/80 mt-1">
-              Snap, upload, and we'll call back in 10 minutes. Up to 14% off.
-            </p>
-          </div>
-
-          <button className="mt-4 w-fit px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm">
-            Upload now →
-          </button>
-        </div>
       </div>
     </div>
   );

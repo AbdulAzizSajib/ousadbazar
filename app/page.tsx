@@ -8,6 +8,7 @@ import { apiBasePharma, formatNumber, imgBasePharma } from '@/lib/config';
 import { useCartStore } from '@/stores/cartStore';
 import ProductCard from '@/components/ProductCard';
 import HeroCarousel from '@/components/HeroCarousel';
+import CategoryCarousel from '@/components/CategoryCarousel';
 import type { Product } from '@/types';
 
 export default function HomePage() {
@@ -86,13 +87,95 @@ export default function HomePage() {
       />
 
       {/* Hero Carousel */}
-      <HeroCarousel />
+      <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2">
+        <HeroCarousel />  
+      </div>
+
+      {/* Feature Highlights */}
+      <div className="mt-6 bg-gradient-to-b from-[#FFFFFF] to-[#EAEBF4] shadow-lg border-t border-gray-200  rounded-lg  border">
+        <div className="flex flex-wrap md:flex-nowrap items-center">
+          <div className="w-1/2 md:flex-1 flex items-center gap-3 px-10 py-10">
+            <Icon icon="mdi:truck-fast" className="text-yellow-400 shrink-0" width={40} height={40} />
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm md:text-base">Quick Delivery</h3>
+              <p className="text-xs md:text-sm text-gray-500">Within 6 Hours in Dhaka City</p>
+            </div>
+          </div>
+          <div className="hidden md:block border-l border-slate-300 h-20" />
+          <div className="w-1/2 md:flex-1 flex items-center gap-3 px-4 py-4">
+            <Icon icon="solar:phone-calling-bold" className="text-green-500 shrink-0" width={40} height={40} />
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm md:text-base">24/7 Hour Service</h3>
+              <p className="text-xs md:text-sm text-gray-500">Pharmacists On Call 24/7</p>
+            </div>
+          </div>
+          <div className="hidden md:block border-l border-slate-300 h-20" />
+          <div className="w-1/2 md:flex-1 flex items-center gap-3 px-4 py-4">
+            <Icon icon="mdi:currency-bdt" className="text-blue-500 shrink-0 border-2 border-blue-500 rounded-full p-1" width={40} height={40} />
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm md:text-base">Affordable Prices</h3>
+              <p className="text-xs md:text-sm text-gray-500">Buy At Low Price And Avail Discount</p>
+            </div>
+          </div>
+          <div className="hidden md:block border-l border-slate-300 h-20" />
+          <div className="w-1/2 md:flex-1 flex items-center gap-3 px-4 py-4">
+            <Icon icon="mdi:clipboard-text-outline" className="text-amber-600 shrink-0" width={40} height={40} />
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm md:text-base">E-Prescription</h3>
+              <p className="text-xs md:text-sm text-gray-500">E-Prescription Facility Through My Health</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* How to Order */}
+      <div className="relative mt-4 overflow-hidden rounded-lg shadow-sm border border-gray-200 px-6 py-6 md:px-8 md:py-8 bg-gradient-to-br from-white via-[#f4f5f9] to-[#e7e9f5]">
+        <span className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-br from-[#5360A7]/15 to-transparent blur-2xl" />
+        <span className="pointer-events-none absolute -bottom-12 -left-10 w-48 h-48 rounded-full bg-gradient-to-tr from-[#7c88c9]/15 to-transparent blur-2xl" />
+
+        <div className="relative flex items-center justify-between gap-6 flex-wrap">
+          <div className="shrink-0">
+            <h2 className="text-lg md:text-xl font-bold bg-clip-text">
+              How To Order
+            </h2>
+            <p className="text-xs md:text-sm text-gray-500 mt-1">Get your medicines in 3 simple steps</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1 min-w-[260px]">
+            {[
+              { step: '01', icon: 'mdi:magnify',              title: 'Search Medicine', desc: 'Find what you need',  card: 'from-[#eef0fb] to-[#dde2f6]', iconBg: 'from-[#5360A7] to-[#7c88c9]' },
+              { step: '02', icon: 'mdi:cart-outline',         title: 'Add To Cart',     desc: 'Place your order',    card: 'from-[#e7f4f2] to-[#cfe7e2]', iconBg: 'from-[#2ea89a] to-[#57c7b7]' },
+              { step: '03', icon: 'mdi:truck-check-outline',  title: 'Get Delivery',    desc: 'At your doorstep',    card: 'from-[#fff2e3] to-[#ffe1c2]', iconBg: 'from-[#f59e0b] to-[#fbbf24]' },
+            ].map((s) => (
+              <div
+                key={s.step}
+                className={`relative flex items-center gap-3 px-4 py-4 rounded-lg bg-gradient-to-br ${s.card} border border-white/60 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all`}
+              >
+                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${s.iconBg} flex items-center justify-center shadow-md shrink-0 ring-2 ring-white`}>
+                  <Icon icon={s.icon} className="text-white" width={26} height={26} />
+                </div>
+                <div className="flex flex-col leading-tight">
+                  <span className="text-[10px] md:text-xs font-bold bg-gradient-to-r from-[#5360A7] to-[#8b96d1] bg-clip-text text-transparent">
+                    STEP {s.step}
+                  </span>
+                  <span className="text-sm md:text-base font-semibold text-gray-800">{s.title}</span>
+                  <span className="text-[11px] md:text-xs text-gray-500 mt-0.5">{s.desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+
+
+      {/* Category Carousel */}
+      <CategoryCarousel />
 
       {/* Best Selling Products Header */}
-      <div className="flex justify-between items-center my-8 ">
-        <h2 className="text-base md:text-2xl font-bold capitalize">Best Selling</h2>
+      <div className="flex justify-between items-center mt-16  mb-8 text-primary">
+        <h2 className="md:text-2xl font-bold text-black capitalize">Best Selling</h2>
         <Link href="/best-selling">
-          <button className=" dark:bg-gray-800  text-primary px-2 md:px-6 py-0.5 md:py-2">
+          <button className=" dark:bg-gray-800  font-semibold  px-2 md:px-6 py-0.5 md:py-2">
             See All <Icon icon="ant-design:arrow-right-outlined" className="inline align-middle" />
           </button>
         </Link>

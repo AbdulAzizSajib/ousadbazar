@@ -27,12 +27,78 @@ export default function Header({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showTopBar, setShowTopBar] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const cartProduct = useCartStore((s) => s.cartProduct);
   const totalPrice = useCartStore((s) => s.totalPrice);
   const searchStore = useSearchStore();
   const navSearchInput = useRef<HTMLInputElement>(null);
   const mobileSearchInput = useRef<HTMLInputElement>(null);
   const lastScrollY = useRef(0);
+
+  const navMenus: Record<string, { title: string; items: string[] }[]> = {
+    Products: [
+      {
+        title: 'Personal Care',
+        items: ['Skin Care', 'Hair Care', 'Oral Care', 'Bath & Body', 'Men Grooming'],
+      },
+      {
+        title: 'Baby Care',
+        items: ['Diapers', 'Baby Food', 'Baby Skin Care', 'Baby Bath', 'Baby Accessories'],
+      },
+      {
+        title: 'Health Food',
+        items: ['Protein Supplements', 'Vitamins', 'Herbal Products', 'Nutrition Bars'],
+      },
+      {
+        title: 'Wellness',
+        items: ['Immunity Boosters', 'Weight Management', 'Sexual Wellness', 'Ayurveda'],
+      },
+    ],
+    Medicines: [
+      {
+        title: 'By Category',
+        items: [
+          'Pain Relief',
+          'Cold & Flu',
+          'Diabetes Care',
+          'Heart Care',
+          'Digestive Care',
+          'Antibiotics',
+        ],
+      },
+      {
+        title: 'Prescription',
+        items: ['Upload Prescription', 'Chronic Medicines', 'Refill Medicines'],
+      },
+      {
+        title: 'Popular Brands',
+        items: ['Square', 'Beximco', 'Incepta', 'Renata', 'ACI Pharma', 'Eskayef'],
+      },
+      {
+        title: 'Forms',
+        items: ['Tablets', 'Capsules', 'Syrups', 'Injections', 'Ointments', 'Drops'],
+      },
+    ],
+    Equipment: [
+      {
+        title: 'Diagnostic',
+        items: ['Thermometers', 'BP Monitors', 'Glucometers', 'Pulse Oximeter', 'Stethoscopes'],
+      },
+      {
+        title: 'Mobility Aids',
+        items: ['Wheelchairs', 'Walking Sticks', 'Crutches', 'Walkers'],
+      },
+      {
+        title: 'Respiratory',
+        items: ['Nebulizers', 'Oxygen Concentrators', 'CPAP Machines', 'Inhalers'],
+      },
+      {
+        title: 'Orthopedic',
+        items: ['Knee Support', 'Back Support', 'Ankle Support', 'Cervical Pillows'],
+      },
+    ],
+  };
 
   const isSearchPage = pathname === '/search' || pathname === '/search/';
 
@@ -44,6 +110,16 @@ export default function Header({
       }, 100);
     }
   }, [isSearchPage]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,48 +138,54 @@ export default function Header({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
-    // ✅ পুরো header এক wrapper এ, translateY দিয়ে slide হবে
     <div
       className={`w-full bg-white sticky top-0 z-50 shadow-sm transition-transform duration-300 ease-in-out ${
-        showTopBar ? 'translate-y-0' : '-translate-y-[36px]'
+        showTopBar ? 'translate-y-0' : '-translate-y-[30px]'
       }`}
     >
-      {/* Top bar — fixed 36px height */}
-      <div className="bg-primary font-light h-[36px] flex items-center">
-        <div className="flex items-center justify-between px-2 container mx-auto text-white">
-          <h2>Welcome to Ousad Bazar</h2>
-          <div className="flex items-center gap-3">
-            <Link href="/order-tracking">Track Order</Link>
-            <p>|</p>
-            <h2>Become a Seller</h2>
-            <p>|</p>
-            <h2>বাংলা</h2>
+      {/* Top bar — fixed 30px height */}
+      <div className="bg-primary font-light h-[30px] flex items-center">
+        <div className="flex items-center justify-center sm:justify-end px-2 container mx-auto text-white">
+          <div className="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-[13px]">
+            <Link className="flex items-center gap-1 sm:gap-2" href="/order-tracking">
+              <Icon icon="subway:location" className="shrink-0" />
+              <span className="hidden sm:inline">Track Order</span>
+              <span className="sm:hidden">Track</span>
+            </Link>
+            <div className="border-l border-slate-300 h-3" />
+            <Link className="flex items-center gap-1 sm:gap-2" href="/order-tracking">
+              <Icon icon="tdesign:chat-bubble-history-filled" className="shrink-0" />
+              <span className="hidden sm:inline">Order History</span>
+              <span className="sm:hidden">History</span>
+            </Link>
+            <div className="border-l border-slate-300 h-3" />
+            <Link className="flex items-center gap-1 sm:gap-2" href="/order-tracking">
+              <Icon icon="garden:upload-fill-16" className="shrink-0" />
+              <span className="hidden sm:inline">Upload Prescription</span>
+              <span className="sm:hidden">Upload</span>
+            </Link>
           </div>
         </div>
       </div>
 
       {/* Navbar */}
-      <nav className="z-[999] container mx-auto dark:bg-gray-900">
-        <div className="mt-2">
+      <nav className="z-[999] container mx-auto dark:bg-gray-900 ">
+        <div className="my-3">
           <div className="flex justify-between items-center h-[56px]">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center group">
                 <img
-                  className="h-10 w-32 md:w-full transition-transform duration-300 group-hover:scale-105"
-                  src={asset('/images/ousadbazar.svg')}
+                  className="h-12 w-12 md:w-full transition-transform duration-300 group-hover:scale-105"
+                  src={asset('/images/logo.svg')}
                   alt="Logo"
                 />
               </Link>
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center justify-end flex-1 space-x-6 lg:space-x-8">
+            <div className="hidden md:flex items-center justify-end flex-1 space-x-6 lg:space-x-8 ">
               {/* Search Bar */}
               <div className="flex-1 ml-[75px]">
                 {isSearchPage ? (
@@ -139,11 +221,11 @@ export default function Header({
                 ) : (
                   <div
                     onClick={() => router.push('/search')}
-                    className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 cursor-pointer hover:border-[#13a89e] hover:bg-white transition-all duration-300 group"
+                    className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 cursor-pointer hover:border-[#5360a7] hover:bg-white transition-all duration-300 group"
                   >
                     <Icon
                       icon="mingcute:search-line"
-                      className="text-gray-400 w-5 h-5 group-hover:text-[#13a89e] transition-colors"
+                      className="text-gray-400 w-5 h-5 group-hover:text-[#5360a7] transition-colors"
                     />
                     <span className="ml-3 text-gray-400 text-sm">
                       Search for medicine, brand, symptom...
@@ -155,7 +237,7 @@ export default function Header({
               {/* Right Side Actions */}
               <div className="flex items-center space-x-3">
                 <span className="border p-2 rounded-lg flex items-center gap-2 font-semibold">
-                  <Icon className="size-5" icon="mdi-light:phone" />
+                  <Icon className="size-5" icon="material-symbols:call" />
                   <h2>01915606090</h2>
                 </span>
 
@@ -170,7 +252,7 @@ export default function Header({
                 >
                   <button
                     onClick={onShowDrawer}
-                    className="px-4 py-2 rounded-xl bg-[#13a89e] text-white transition-all duration-300 active:scale-95 flex items-center gap-1.5 text-base font-semibold"
+                    className="px-4 py-2 rounded-xl bg-[#5360a7] text-white transition-all duration-300 active:scale-95 flex items-center gap-1.5 text-base font-semibold"
                   >
                     <Icon className="size-5" icon="solar:cart-large-2-outline" />
                     cart
@@ -322,23 +404,66 @@ export default function Header({
       </nav>
 
       {/* Desktop sub-navigation */}
-      <div className="py-2 hidden md:block">
-        <div className="flex items-center gap-5 container mx-auto px-4">
-          <h2>Medicine</h2>
-          <h2>Lab Test</h2>
+      <div className="py-2 hidden md:block bg-opacity-50 bg-[#eaebf4] relative" ref={dropdownRef}>
+        <div className="flex items-center text-base text-zinc-900 font-medium space-x-4 justify-center gap-5 container mx-auto px-4">
+          <Link
+            href="/"
+            onClick={() => setOpenDropdown(null)}
+            className="cursor-pointer hover:text-[#5360a7] transition-colors"
+          >
+            Home
+          </Link>
+          {Object.keys(navMenus).map((menu) => (
+            <button
+              key={menu}
+              type="button"
+              onClick={() => setOpenDropdown(openDropdown === menu ? null : menu)}
+              className={`flex items-center cursor-pointer hover:text-[#5360a7] transition-colors ${
+                openDropdown === menu ? 'text-[#5360a7]' : ''
+              }`}
+            >
+              {menu}
+              <span>
+                <Icon
+                  icon="iconamoon:arrow-down-2"
+                  className={`w-5 h-5 transition-transform duration-200 ${
+                    openDropdown === menu ? 'rotate-180' : ''
+                  }`}
+                />
+              </span>
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Scroll to Top Button */}
-      {/* {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 p-3 bg-[#388072] text-white rounded-full shadow-lg shadow-[#388072]/30 hover:bg-[#2d6a5a] transition-all duration-300 active:scale-90"
-          aria-label="Scroll to top"
-        >
-          <Icon icon="solar:arrow-up-linear" className="w-6 h-6" />
-        </button>
-      )} */}
+        {openDropdown && navMenus[openDropdown] && (
+       <div className="absolute left-0 right-0 top-full bg-gradient-to-b from-[#FFFFFF] to-[#EAEBF4] shadow-xl border-t border-gray-200 z-50">
+            <div className="container mx-auto px-4 py-6 my-6">
+              <div className="grid grid-cols-4 gap-8">
+                {navMenus[openDropdown].map((column) => (
+                  <div key={column.title}>
+                    <h3 className="text-sm font-bold text-[#5360a7] uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
+                      {column.title}
+                    </h3>
+                    <ul className="space-y-2">
+                      {column.items.map((item) => (
+                        <li key={item}>
+                          <Link
+                            href={`/search?q=${encodeURIComponent(item)}`}
+                            onClick={() => setOpenDropdown(null)}
+                            className="text-sm text-gray-700 hover:text-[#5360a7] hover:translate-x-1 inline-block transition-all duration-200"
+                          >
+                            {item}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
