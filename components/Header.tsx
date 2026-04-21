@@ -154,13 +154,13 @@ export default function Header({
               <span className="sm:hidden">Track</span>
             </Link>
             <div className="border-l border-slate-300 h-3" />
-            <Link className="flex items-center gap-1 sm:gap-2" href="/order-tracking">
+            <Link className="flex items-center gap-1 sm:gap-2" href="/order-history">
               <Icon icon="tdesign:chat-bubble-history-filled" className="shrink-0" />
               <span className="hidden sm:inline">Order History</span>
               <span className="sm:hidden">History</span>
             </Link>
             <div className="border-l border-slate-300 h-3" />
-            <Link className="flex items-center gap-1 sm:gap-2" href="/order-tracking">
+            <Link className="flex items-center gap-1 sm:gap-2" href="/">
               <Icon icon="garden:upload-fill-16" className="shrink-0" />
               <span className="hidden sm:inline">Upload Prescription</span>
               <span className="sm:hidden">Upload</span>
@@ -170,14 +170,14 @@ export default function Header({
       </div>
 
       {/* Navbar */}
-      <nav className="z-[999] container mx-auto dark:bg-gray-900 ">
-        <div className="my-3">
+      <nav className="z-[999] container mx-auto dark:bg-gray-900 px-3 md:px-0">
+        <div className="my-0  md:my-3">
           <div className="flex justify-between items-center h-[56px]">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center group">
                 <img
-                  className="h-12 w-12 md:w-full transition-transform duration-300 group-hover:scale-105"
+                  className="h-9 sm:h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
                   src={asset('/images/logo.svg')}
                   alt="Logo"
                 />
@@ -221,11 +221,11 @@ export default function Header({
                 ) : (
                   <div
                     onClick={() => router.push('/search')}
-                    className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 cursor-pointer hover:border-[#5360a7] hover:bg-white transition-all duration-300 group"
+                    className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 cursor-pointer hover:border-[#012068] hover:bg-white transition-all duration-300 group"
                   >
                     <Icon
                       icon="mingcute:search-line"
-                      className="text-gray-400 w-5 h-5 group-hover:text-[#5360a7] transition-colors"
+                      className="text-gray-400 w-5 h-5 group-hover:text-[#012068] transition-colors"
                     />
                     <span className="ml-3 text-gray-400 text-sm">
                       Search for medicine, brand, symptom...
@@ -237,7 +237,7 @@ export default function Header({
               {/* Right Side Actions */}
               <div className="flex items-center space-x-3">
                 <span className="border p-2 rounded-lg flex items-center gap-2 font-semibold">
-                  <Icon className="size-5" icon="material-symbols:call" />
+                  <Icon className="size-5 text-[#012068]" icon="material-symbols:call" />
                   <h2>01915606090</h2>
                 </span>
 
@@ -252,7 +252,7 @@ export default function Header({
                 >
                   <button
                     onClick={onShowDrawer}
-                    className="px-4 py-2 rounded-xl bg-[#5360a7] text-white transition-all duration-300 active:scale-95 flex items-center gap-1.5 text-base font-semibold"
+                    className="px-4 py-2 rounded-xl bg-[#012068] text-white transition-all duration-300 active:scale-95 flex items-center gap-1.5 text-base font-semibold"
                   >
                     <Icon className="size-5" icon="solar:cart-large-2-outline" />
                     cart
@@ -394,10 +394,10 @@ export default function Header({
           ) : (
             <div
               onClick={() => router.push('/search')}
-              className="flex items-center bg-gray-50 dark:bg-gray-700 rounded-full border border-gray-200 dark:border-gray-600 px-4 py-2.5 cursor-pointer hover:border-[#388072] transition-all duration-300"
+              className="flex items-center bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600 px-4 py-2.5 cursor-pointer hover:border-[#388072] transition-all duration-300"
             >
               <Icon icon="mingcute:search-line" className="text-gray-400 w-[18px] h-[18px]" />
-              <span className="ml-3 text-gray-400 text-sm">Search medicines...</span>
+              <span className="ml-3 text-gray-400 text-sm">Search for medicine, brand, symptom...</span>
             </div>
           )}
         </div>
@@ -409,7 +409,7 @@ export default function Header({
           <Link
             href="/"
             onClick={() => setOpenDropdown(null)}
-            className="cursor-pointer hover:text-[#5360a7] transition-colors"
+            className="cursor-pointer hover:text-[#012068] transition-colors"
           >
             Home
           </Link>
@@ -418,8 +418,8 @@ export default function Header({
               key={menu}
               type="button"
               onClick={() => setOpenDropdown(openDropdown === menu ? null : menu)}
-              className={`flex items-center cursor-pointer hover:text-[#5360a7] transition-colors ${
-                openDropdown === menu ? 'text-[#5360a7]' : ''
+              className={`flex items-center cursor-pointer hover:text-[#012068] transition-colors ${
+                openDropdown === menu ? 'text-[#012068]' : ''
               }`}
             >
               {menu}
@@ -441,7 +441,7 @@ export default function Header({
               <div className="grid grid-cols-4 gap-8">
                 {navMenus[openDropdown].map((column) => (
                   <div key={column.title}>
-                    <h3 className="text-sm font-bold text-[#5360a7] uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
+                    <h3 className="text-sm font-bold text-[#012068] uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
                       {column.title}
                     </h3>
                     <ul className="space-y-2">
@@ -450,7 +450,7 @@ export default function Header({
                           <Link
                             href={`/search?q=${encodeURIComponent(item)}`}
                             onClick={() => setOpenDropdown(null)}
-                            className="text-sm text-gray-700 hover:text-[#5360a7] hover:translate-x-1 inline-block transition-all duration-200"
+                            className="text-sm text-gray-700 hover:text-[#012068] hover:translate-x-1 inline-block transition-all duration-200"
                           >
                             {item}
                           </Link>

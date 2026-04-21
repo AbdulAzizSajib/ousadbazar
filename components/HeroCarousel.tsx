@@ -44,17 +44,21 @@ export default function HeroCarousel({
           className="flex transition-transform duration-700 ease-in-out h-full"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
-          {slides.map((slide) => {
+          {slides.map((slide, i) => {
             const img = (
               <img
                 src={slide.image}
                 alt={slide.alt || `Slide ${slide.id}`}
-                className="block w-full h-[220px] sm:h-[260px] md:h-[320px] lg:h-[420px] "
+                loading={i === 0 ? 'eager' : 'lazy'}
+                className="block w-full h-full object-cover object-center"
               />
             );
             return (
-              <div key={slide.id} className="min-w-full h-full">
-                {slide.href ? <Link href={slide.href}>{img}</Link> : img}
+              <div
+                key={slide.id}
+                className="min-w-full aspect-[16/7] sm:aspect-[16/6] md:aspect-[32/9] lg:aspect-[32/8] xl:aspect-[32/7]"
+              >
+                {slide.href ? <Link href={slide.href} className="block w-full h-full">{img}</Link> : img}
               </div>
             );
           })}

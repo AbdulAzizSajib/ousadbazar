@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        <link rel="icon" type="image/png" href="/ousadbazar/fav.png" />
+        <link rel="icon" type="image/png" href="/public/ousadbazar/fav.svg" />
       </head>
       <body className={`${poppins.className} bg-[#f9fafb]`}>
         <QueryProviders>

@@ -15,14 +15,118 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ id }: ProductDetailClientProps) {
   const { data: productDetail, isLoading: loading } = useProduct(id);
+  const getCart = useCartStore((s) => s.getCart);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [calculatedItems, setCalculatedItems] = useState<{ index: number; quantity: number }[]>([]);
   const [activeTab, setActiveTab] = useState<"description" | "details" | "faq">("description");
   const [zoomed, setZoomed] = useState(false);
-  const getCart = useCartStore((s) => s.getCart);
+  const [loadingItemId, setLoadingItemId] = useState<string | number | null>(null);
+  const [quantity, setQuantity] = useState(0); // 0 = not added yet
 
   const stockQty = (item: Record<string, unknown> | null | undefined) =>
     parseFloat(String(item?.balanced_quantity || 0));
+
+  const packQty = productDetail?.quantity || 1;
+  const packPrice = Number(productDetail?.ecom_final_selling_price || productDetail?.selling_price || 0);
+  const finalPrice = packPrice / Number(packQty);
+  const perPieceSellingPrice = Number(productDetail?.selling_price || 0) / Number(packQty);
+  const hasDiscount = false; // Will be calculated after loading
+  const discountPct = 0; // Will be calculated after loading
+  const totalPrice = (quantity * finalPrice).toFixed(2);
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const newQty = 1;
+    setQuantity(newQty);
+    setLoadingItemId(id);
+    try {
+      if (productDetail) {
+        const normalizedProduct: Product = {
+          ...productDetail,
+          id: productDetail.id as number,
+          name: productDetail.name as string,
+          product_prices: {
+            selling_price: Number(productDetail.selling_price || 0),
+            ecom_final_selling_price: Number(
+              productDetail.ecom_final_selling_price || productDetail.selling_price || 0
+            ),
+            ecom_discount_percentage: (productDetail.ecom_discount_percentage as number) || null,
+            pack_quantity: Number(productDetail.quantity || 1),
+          },
+          stock_batches: (productDetail.stock_batches as { balanced_quantity: number }[]) || [
+            { balanced_quantity: Number(productDetail.balanced_quantity || 0) },
+          ],
+          product_images:
+            (productDetail.product_images as { path: string }[]) ||
+            (productDetail.path ? [{ path: productDetail.path as string }] : []),
+        };
+        getCart(normalizedProduct, newQty, newQty);
+      }
+    } finally {
+      setLoadingItemId(null);
+    }
+  };
+
+  const handleIncrease = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (quantity >= stock) return;
+    const newQty = quantity + 1;
+    setQuantity(newQty);
+    if (productDetail) {
+      const normalizedProduct: Product = {
+        ...productDetail,
+        id: productDetail.id as number,
+        name: productDetail.name as string,
+        product_prices: {
+          selling_price: Number(productDetail.selling_price || 0),
+          ecom_final_selling_price: Number(
+            productDetail.ecom_final_selling_price || productDetail.selling_price || 0
+          ),
+          ecom_discount_percentage: (productDetail.ecom_discount_percentage as number) || null,
+          pack_quantity: Number(productDetail.quantity || 1),
+        },
+        stock_batches: (productDetail.stock_batches as { balanced_quantity: number }[]) || [
+          { balanced_quantity: Number(productDetail.balanced_quantity || 0) },
+        ],
+        product_images:
+          (productDetail.product_images as { path: string }[]) ||
+          (productDetail.path ? [{ path: productDetail.path as string }] : []),
+      };
+      getCart(normalizedProduct, newQty, newQty);
+    }
+  };
+
+  const handleDecrease = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (quantity <= 1) {
+      setQuantity(0);
+      return;
+    }
+    const newQty = quantity - 1;
+    setQuantity(newQty);
+    if (productDetail) {
+      const normalizedProduct: Product = {
+        ...productDetail,
+        id: productDetail.id as number,
+        name: productDetail.name as string,
+        product_prices: {
+          selling_price: Number(productDetail.selling_price || 0),
+          ecom_final_selling_price: Number(
+            productDetail.ecom_final_selling_price || productDetail.selling_price || 0
+          ),
+          ecom_discount_percentage: (productDetail.ecom_discount_percentage as number) || null,
+          pack_quantity: Number(productDetail.quantity || 1),
+        },
+        stock_batches: (productDetail.stock_batches as { balanced_quantity: number }[]) || [
+          { balanced_quantity: Number(productDetail.balanced_quantity || 0) },
+        ],
+        product_images:
+          (productDetail.product_images as { path: string }[]) ||
+          (productDetail.path ? [{ path: productDetail.path as string }] : []),
+      };
+      getCart(normalizedProduct, newQty, newQty);
+    }
+  };
 
   const handleDropdownClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -58,6 +162,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
         (productDetail.product_images as { path: string }[]) ||
         (productDetail.path ? [{ path: productDetail.path as string }] : []),
     };
+    setQuantity(quantity);
     getCart(normalizedProduct, quantity, index);
     setDropdownOpen(false);
   };
@@ -172,14 +277,15 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
     );
   }
 
-  const sellingPrice = Number(productDetail?.selling_price || 0);
-  const tp = Number(productDetail?.tp || 0);
-  const hasDiscount = tp > sellingPrice;
-  const discountPct = hasDiscount ? Math.round(((tp - sellingPrice) / tp) * 100) : 0;
-  const inStock = stockQty(productDetail) > 0;
+  const stock = stockQty(productDetail);
   const imageSrc = productDetail?.path
     ? `${imgBasePharma}/${productDetail.path}`
     : asset("/images/default.jpg");
+
+  const sellingPrice = Number(productDetail?.selling_price || 0);
+  const tp = Number(productDetail?.tp || 0);
+  const hasDiscountTp = tp > sellingPrice;
+  const discountPctTp = hasDiscountTp ? Math.round(((tp - sellingPrice) / tp) * 100) : 0;
 
   const menuItems = calculatedItems.map((item) => ({
     key: item.index,
@@ -206,12 +312,12 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
       <div className="container mx-auto px-3 md:px-6 py-4 md:py-6">
         {/* Breadcrumb */}
         <nav className="flex items-center flex-wrap gap-1.5 text-xs md:text-sm mb-4 md:mb-6" aria-label="Breadcrumb">
-          <Link href="/" className="inline-flex items-center gap-1 text-gray-500 hover:text-[#388072] transition-colors">
+          <Link href="/" className="inline-flex items-center gap-1 text-gray-500 hover:text-[#012068] transition-colors">
             <Icon className="w-4 h-4" icon="mdi:home-outline" />
             <span>Home</span>
           </Link>
           <Icon icon="mdi:chevron-right" className="w-4 h-4 text-gray-300" />
-          <Link href="/all-medicines" className="text-gray-500 hover:text-[#388072] transition-colors">
+          <Link href="/all-medicines" className="text-gray-500 hover:text-[#012068] transition-colors">
             All Medicines
           </Link>
           {productDetail?.category_name ? (
@@ -236,20 +342,6 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                   className="relative aspect-square rounded-xl overflow-hidden bg-white border border-gray-100 cursor-zoom-in group"
                   onClick={() => setZoomed(true)}
                 >
-                  {hasDiscount && (
-                    <span className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-md">
-                      -{discountPct}% OFF
-                    </span>
-                  )}
-                  <span
-                    className={`absolute top-3 right-3 z-10 text-[10px] font-semibold px-2 py-1 rounded-md shadow-sm ${
-                      inStock
-                        ? "bg-green-50 text-green-700 border border-green-200"
-                        : "bg-red-50 text-red-700 border border-red-200"
-                    }`}
-                  >
-                    {inStock ? "● In Stock" : "● Out of Stock"}
-                  </span>
                   <img
                     className="w-full h-full object-contain p-6 transition-transform duration-500 group-hover:scale-105"
                     src={imageSrc}
@@ -261,20 +353,34 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                   <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur border border-gray-200 rounded-lg p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Icon icon="mdi:magnify-plus-outline" className="w-4 h-4 text-gray-600" />
                   </div>
+                  {hasDiscountTp && (
+                    <span className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-md">
+                      -{discountPctTp}% OFF
+                    </span>
+                  )}
+                  <span
+                    className={`absolute top-3 right-3 z-10 text-[10px] font-semibold px-2 py-1 rounded-md shadow-sm ${
+                      stock > 0
+                        ? "bg-green-50 text-green-700 border border-green-200"
+                        : "bg-red-50 text-red-700 border border-red-200"
+                    }`}
+                  >
+                    {stock > 0 ? "● In Stock" : "● Out of Stock"}
+                  </span>
                 </div>
 
                 {/* Trust badges */}
                 <div className="grid grid-cols-3 gap-2 mt-4">
                   <div className="flex flex-col items-center gap-1 p-2 bg-white border border-gray-100 rounded-lg">
-                    <Icon icon="mdi:shield-check-outline" className="w-5 h-5 text-[#388072]" />
+                    <Icon icon="mdi:shield-check-outline" className="w-5 h-5 text-[#012068]" />
                     <span className="text-[10px] text-center text-gray-600 font-medium">100% Genuine</span>
                   </div>
                   <div className="flex flex-col items-center gap-1 p-2 bg-white border border-gray-100 rounded-lg">
-                    <Icon icon="mdi:truck-fast-outline" className="w-5 h-5 text-[#388072]" />
+                    <Icon icon="mdi:truck-fast-outline" className="w-5 h-5 text-[#012068]" />
                     <span className="text-[10px] text-center text-gray-600 font-medium">Fast Delivery</span>
                   </div>
                   <div className="flex flex-col items-center gap-1 p-2 bg-white border border-gray-100 rounded-lg">
-                    <Icon icon="mdi:cash-refund" className="w-5 h-5 text-[#388072]" />
+                    <Icon icon="mdi:cash-refund" className="w-5 h-5 text-[#012068]" />
                     <span className="text-[10px] text-center text-gray-600 font-medium">Easy Return</span>
                   </div>
                 </div>
@@ -285,7 +391,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
             <div className="p-5 md:p-8">
               {/* Category */}
               {productDetail?.category_name ? (
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#388072] mb-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#012068] mb-2">
                   {String(productDetail.category_name)}
                 </p>
               ) : null}
@@ -298,7 +404,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
               {/* Generic + supplier pills */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {productDetail?.generic_name ? (
-                  <span className="inline-flex items-center gap-1.5 bg-[#388072]/10 text-[#388072] text-xs font-medium px-2.5 py-1 rounded-md">
+                  <span className="inline-flex items-center gap-1.5 bg-[#012068]/10 text-[#012068] text-xs font-medium px-2.5 py-1 rounded-md">
                     <Icon icon="mdi:pill" className="w-3.5 h-3.5" />
                     {String(productDetail.generic_name)}
                   </span>
@@ -331,14 +437,14 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
               <div className="mb-5">
                 <p className="text-xs text-gray-500 mb-1">প্রতি ইউনিট মূল্য / Price per unit</p>
                 <div className="flex items-baseline flex-wrap gap-3">
-                  <span className="text-3xl md:text-4xl font-bold text-[#388072]">
+                  <span className="text-3xl md:text-4xl font-bold text-[#012068]">
                     ৳{sellingPrice.toFixed(2)}
                   </span>
-                  {hasDiscount && (
+                  {hasDiscountTp && (
                     <>
                       <span className="text-lg text-gray-400 line-through">৳{tp.toFixed(2)}</span>
                       <span className="bg-red-50 text-red-600 text-xs font-bold px-2 py-1 rounded-md border border-red-100">
-                        Save {discountPct}%
+                        Save {discountPctTp}%
                       </span>
                     </>
                   )}
@@ -351,18 +457,18 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                      inStock ? "bg-green-100" : "bg-red-100"
+                      stock > 0 ? "bg-green-100" : "bg-red-100"
                     }`}
                   >
                     <Icon
-                      icon={inStock ? "mdi:check-circle-outline" : "mdi:close-circle-outline"}
-                      className={`w-5 h-5 ${inStock ? "text-green-600" : "text-red-600"}`}
+                      icon={stock > 0 ? "mdi:check-circle-outline" : "mdi:close-circle-outline"}
+                      className={`w-5 h-5 ${stock > 0 ? "text-green-600" : "text-red-600"}`}
                     />
                   </div>
                   <div className="min-w-0">
                     <p className="text-[11px] text-gray-500">Availability</p>
                     <p className="font-semibold text-gray-900 text-sm">
-                      {stockQty(productDetail)}{" "}
+                      {stock}{" "}
                       <span className="text-xs font-normal text-gray-500">units</span>
                     </p>
                   </div>
@@ -380,31 +486,70 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
 
               {/* CTA buttons */}
               <div className="flex gap-3 mb-5">
-                <Dropdown
-                  menu={{ items: menuItems }}
-                  trigger={["click"]}
-                  open={dropdownOpen}
-                  onOpenChange={setDropdownOpen}
-                >
-                  <button
-                    className={`flex-1 bg-[#388072] hover:bg-[#2d6a5a] py-3.5 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm shadow-md shadow-[#388072]/20 active:scale-[0.98] ${
-                      !inStock ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    disabled={!inStock}
-                    onClick={handleDropdownClick}
+                {quantity === 0 ? (
+                  // Add to cart button
+                  <Dropdown
+                    menu={{ items: menuItems }}
+                    trigger={["click"]}
+                    open={dropdownOpen}
+                    onOpenChange={setDropdownOpen}
                   >
-                    <Icon icon="solar:cart-plus-bold" className="w-5 h-5" />
-                    <span>Add To Cart</span>
-                  </button>
-                </Dropdown>
+                    <button
+                      className={`flex-1 bg-[#012068] hover:bg-[#012068]/80 py-3.5 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm shadow-md shadow-[#012068]/20 active:scale-[0.98] ${
+                        stock < 1 ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                      disabled={stock < 1}
+                      onClick={handleAdd}
+                    >
+                      {loadingItemId === id ? (
+                        <Icon className="w-5 h-5 animate-spin" icon="mingcute:loading-line" />
+                      ) : (
+                        <>
+                          <Icon icon="solar:cart-plus-bold" className="w-5 h-5" />
+                          <span>Add To Cart</span>
+                        </>
+                      )}
+                    </button>
+                  </Dropdown>
+                ) : (
+                  // Counter + price
+                  <div className="flex-1 flex flex-col gap-1">
+                    {/* Total price */}
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-gray-500">Total</span>
+                      <span className="font-mono text-lg font-medium text-[#012068] tabular-nums">
+                        ৳{totalPrice}
+                      </span>
+                    </div>
+                    {/* Counter */}
+                    <div className="flex items-center justify-between rounded-xl border-2 border-[#012068] overflow-hidden">
+                      <button
+                        onClick={handleDecrease}
+                        className="flex h-12 w-12 items-center justify-center text-[#012068] hover:bg-[#012068] hover:text-white transition-colors"
+                      >
+                        <Icon icon="tdesign:minus" className="w-4 h-4" />
+                      </button>
+                      <span className="flex-1 text-center text-lg font-medium text-gray-800">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={handleIncrease}
+                        disabled={quantity >= stock}
+                        className="flex h-12 w-12 items-center justify-center text-[#012068] hover:bg-[#012068] hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <Icon icon="mingcute:add-line" className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <button
-                  className="w-12 h-12 bg-white border border-gray-200 hover:border-[#388072] hover:text-[#388072] rounded-xl transition-colors flex items-center justify-center text-gray-600"
+                  className="w-12 h-12 bg-white border border-gray-200 hover:border-[#012068] hover:text-[#012068] rounded-xl transition-colors flex items-center justify-center text-gray-600"
                   aria-label="Add to wishlist"
                 >
                   <Icon icon="mdi:heart-outline" className="w-5 h-5" />
                 </button>
                 <button
-                  className="w-12 h-12 bg-white border border-gray-200 hover:border-[#388072] hover:text-[#388072] rounded-xl transition-colors flex items-center justify-center text-gray-600"
+                  className="w-12 h-12 bg-white border border-gray-200 hover:border-[#012068] hover:text-[#012068] rounded-xl transition-colors flex items-center justify-center text-gray-600"
                   aria-label="Share"
                   onClick={() => {
                     if (navigator.share) {
@@ -419,21 +564,21 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
               </div>
 
               {/* Benefits list */}
-              <div className="bg-gradient-to-br from-[#388072]/5 to-emerald-50/50 border border-[#388072]/15 rounded-xl p-4 space-y-2.5">
+              <div className="bg-gradient-to-br from-[#012068]/5 to-emerald-50/50 border border-[#012068]/15 rounded-xl p-4 space-y-2.5">
                 <div className="flex items-start gap-2.5">
-                  <Icon icon="mdi:check-decagram" className="w-4 h-4 text-[#388072] shrink-0 mt-0.5" />
+                  <Icon icon="mdi:check-decagram" className="w-4 h-4 text-[#012068] shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700">
                     Authentic product sourced directly from manufacturer
                   </span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <Icon icon="mdi:check-decagram" className="w-4 h-4 text-[#388072] shrink-0 mt-0.5" />
+                  <Icon icon="mdi:check-decagram" className="w-4 h-4 text-[#012068] shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700">
                     Cash on delivery available across Aftab Nagar
                   </span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <Icon icon="mdi:check-decagram" className="w-4 h-4 text-[#388072] shrink-0 mt-0.5" />
+                  <Icon icon="mdi:check-decagram" className="w-4 h-4 text-[#012068] shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700">
                     Secure packaging & temperature-controlled storage
                   </span>
@@ -456,7 +601,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
                 className={`flex items-center gap-2 px-5 md:px-6 py-4 text-sm font-medium whitespace-nowrap transition-colors border-b-2 ${
                   activeTab === tab.key
-                    ? "text-[#388072] border-[#388072] bg-[#388072]/5"
+                    ? "text-[#012068] border-[#012068] bg-[#012068]/5"
                     : "text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
@@ -515,13 +660,13 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
               <div className="divide-y divide-gray-100">
                 {faqItems.map((faq, i) => (
                   <details key={i} className="group py-1">
-                    <summary className="flex items-center justify-between cursor-pointer py-3 hover:text-[#388072] transition-colors list-none">
-                      <span className="font-medium text-gray-900 text-sm pr-4 group-hover:text-[#388072]">
+                    <summary className="flex items-center justify-between cursor-pointer py-3 hover:text-[#012068] transition-colors list-none">
+                      <span className="font-medium text-gray-900 text-sm pr-4 group-hover:text-[#012068]">
                         {faq.question}
                       </span>
                       <Icon
                         icon="mdi:plus"
-                        className="w-5 h-5 text-gray-400 shrink-0 transition-transform group-open:rotate-45 group-hover:text-[#388072]"
+                        className="w-5 h-5 text-gray-400 shrink-0 transition-transform group-open:rotate-45 group-hover:text-[#012068]"
                       />
                     </summary>
                     <p className="pb-4 pt-1 text-sm text-gray-600 leading-relaxed">{faq.answer}</p>

@@ -35,7 +35,7 @@ function SearchContent() {
       )}
 
       {searchStore.searchLoading && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-4">
           {Array.from({ length: 10 }, (_, n) => (
             <div key={`skeleton-${n}`} className="bg-white border rounded-lg overflow-hidden animate-pulse">
               <div className="w-full h-[180px] bg-gray-200" />
@@ -46,7 +46,7 @@ function SearchContent() {
       )}
 
       {!searchStore.searchLoading && searchStore.searchData.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 capitalize place-items-stretch">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-4 capitalize place-items-stretch">
           {searchStore.searchData.map((item) => (
             <ProductCard key={item.id} item={item} />
           ))}

@@ -6,22 +6,22 @@ import { asset } from "@/lib/config";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#5360a7] text-white ">
+    <footer className="bg-[#012068] text-white ">
       {/* Main Footer */}
-      <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-8 lg:gap-12">
+
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link href="/">
+            <Link href="/" className="inline-block">
               <img
                 src={asset("/images/logo.svg")}
                 alt="OusadBazar"
-                className="h-10 mb-5 brightness-0 invert"
+                className="h-10 mb-6 brightness-0 invert"
               />
             </Link>
-            <p className="text-gray-300 text-sm leading-relaxed mb-5">
-              High-quality medicines, healthcare products, and daily essentials 
+            <p className="text-gray-300 text-sm leading-relaxed mb-7 max-w-sm">
+              High-quality medicines, healthcare products, and daily essentials
               delivered to your doorstep quickly at affordable prices.
             </p>
             <div className="flex items-center gap-3">
@@ -54,10 +54,10 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-lg mb-5 pb-2 border-b border-white/30">
+            <h3 className="font-semibold text-lg mb-6 pb-3 border-b border-white/20">
               Quick Links
             </h3>
-            <ul className="space-y-3 text-sm">
+            <ul className="space-y-4 text-sm">
               <li>
                 <Link href="/" className="text-gray-300 hover:text-white hover:pl-1 transition-all">
                   Home
@@ -83,10 +83,10 @@ export default function Footer() {
 
           {/* Customer Service */}
           <div>
-            <h3 className="font-semibold text-lg mb-5 pb-2 border-b border-white/30">
+            <h3 className="font-semibold text-lg mb-6 pb-3 border-b border-white/20">
               Customer Service
             </h3>
-            <ul className="space-y-3 text-sm">
+            <ul className="space-y-4 text-sm">
               <li>
                 <Link href="#" className="text-gray-300 hover:text-white hover:pl-1 transition-all">
                   Terms & Conditions
@@ -112,30 +112,30 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold text-lg mb-5 pb-2 border-b border-white/30">
+            <h3 className="font-semibold text-lg mb-6 pb-3 border-b border-white/20">
               Contact
             </h3>
-            <ul className="space-y-4 text-sm">
+            <ul className="space-y-5 text-sm">
               <li className="flex items-start gap-3">
-                <Icon icon="solar:map-point-linear" className="w-5 h-5 mt-0.5 text-gray-300" />
-                <span className="text-gray-300">
+                <Icon icon="solar:map-point-linear" className="w-5 h-5 mt-0.5 text-gray-300 shrink-0" />
+                <span className="text-gray-300 leading-relaxed">
                   House 37, Block F, Sector 1, Aftabnagar, Dhaka 1212
                 </span>
               </li>
               <li className="flex items-center gap-3">
-                <Icon icon="solar:phone-linear" className="w-5 h-5 text-gray-300" />
+                <Icon icon="solar:phone-linear" className="w-5 h-5 text-gray-300 shrink-0" />
                 <a href="tel:+8801915606090" className="text-gray-300 hover:text-white">
                   +880 1915-606090
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <Icon icon="solar:letter-linear" className="w-5 h-5 text-gray-300" />
-                <a href="mailto:info@ousadbazar.com" className="text-gray-300 hover:text-white">
+                <Icon icon="solar:letter-linear" className="w-5 h-5 text-gray-300 shrink-0" />
+                <a href="mailto:info@ousadbazar.com" className="text-gray-300 hover:text-white break-all">
                   info@ousadbazar.com
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <Icon icon="solar:clock-circle-linear" className="w-5 h-5 text-gray-300" />
+                <Icon icon="solar:clock-circle-linear" className="w-5 h-5 text-gray-300 shrink-0" />
                 <span className="text-gray-300">9:00 AM - 10:00 PM</span>
               </li>
             </ul>
@@ -146,20 +146,20 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="border-t border-white/15">
-        <div className="container mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-5 md:gap-6">
           <p className="text-gray-400 text-sm text-center md:text-left">
             &copy; 2025 OusadBazar.com — All rights reserved.
           </p>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
             <div className="flex items-center gap-2 text-gray-400 text-xs">
               <Icon icon="solar:shield-check-bold" className="w-4 h-4 text-green-400" />
               <span>Secure Payment</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400 border border-gray-500 rounded px-2 py-1">
+              <span className="text-xs text-gray-400 border border-gray-500 rounded px-2.5 py-1">
                 bKash
               </span>
-              <span className="text-xs text-gray-400 border border-gray-500 rounded px-2 py-1">
+              <span className="text-xs text-gray-400 border border-gray-500 rounded px-2.5 py-1">
                 Nagad
               </span>
             </div>

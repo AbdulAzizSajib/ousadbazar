@@ -136,7 +136,7 @@ export default function ProductCard({ item }: ProductCardProps) {
               className={`flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-[12px] font-medium tracking-wide transition-all duration-150
                 ${
                   stock >= 1
-                    ? 'border border-[#5360A7] text-[#5360A7] hover:bg-[#5360A7] hover:text-white active:scale-[0.98]'
+                    ? 'border border-[#012068] text-[#012068] hover:bg-[#012068] hover:text-white active:scale-[0.98]'
                     : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
                 }`}
             >
@@ -165,7 +165,7 @@ export default function ProductCard({ item }: ProductCardProps) {
               <div className="flex items-center justify-between rounded-lg border border-primary overflow-hidden">
                 <button
                   onClick={handleDecrease}
-                  className="flex h-8 w-8 items-center justify-center text-[#5360A7] hover:bg-[#5360A7] hover:text-white transition-colors"
+                  className="flex h-8 w-8 items-center justify-center text-[#012068] hover:bg-[#012068] hover:text-white transition-colors"
                 >
                   <Icon icon="tdesign:minus" className="h-3.5 w-3.5" />
                 </button>
@@ -175,7 +175,7 @@ export default function ProductCard({ item }: ProductCardProps) {
                 <button
                   onClick={handleIncrease}
                   disabled={quantity >= stock}
-                  className="flex h-8 w-8 items-center justify-center text-[#5360A7] hover:bg-[#5360A7] hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex h-8 w-8 items-center justify-center text-[#012068] hover:bg-[#012068] hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Icon icon="mingcute:add-line" className="h-3.5 w-3.5" />
                 </button>

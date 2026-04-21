@@ -99,14 +99,14 @@ export default function CheckoutPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-5 border-b pb-3">Billing details</h2>
             <div className="space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Your Name <span className="text-red-500">*</span></label>
-                <input type="text" className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#388072] outline-none transition" placeholder="আপনার নাম" value={address.full_name} onChange={(e) => setAddress((p) => ({ ...p, full_name: e.target.value }))} /></div>
+                <input type="text" className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition" placeholder="আপনার নাম" value={address.full_name} onChange={(e) => setAddress((p) => ({ ...p, full_name: e.target.value }))} /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Your Full Address <span className="text-red-500">*</span></label>
-                <input type="text" className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#388072] outline-none transition" placeholder="আপনার পূর্ণ ঠিকানা" value={address.address} onChange={(e) => setAddress((p) => ({ ...p, address: e.target.value }))} readOnly={!!storedUser} /></div>
+                <input type="text" className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition" placeholder="আপনার পূর্ণ ঠিকানা" value={address.address} onChange={(e) => setAddress((p) => ({ ...p, address: e.target.value }))} readOnly={!!storedUser} /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Your Phone Number <span className="text-red-500">*</span></label>
-                <input type="tel" className={`w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#388072] outline-none transition ${!isValidMobile && address.mobile ? "border-red-400" : ""}`} placeholder="আপনার মোবাইল নম্বর" value={address.mobile} onChange={(e) => onlyNumber(e.target.value)} />
+                <input type="tel" className={`w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition ${!isValidMobile && address.mobile ? "border-red-400" : ""}`} placeholder="আপনার মোবাইল নম্বর" value={address.mobile} onChange={(e) => onlyNumber(e.target.value)} />
                 {!isValidMobile && address.mobile && <p className="text-red-500 text-xs mt-1">{validationError}</p>}</div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
-                <input className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#388072] outline-none transition" placeholder="অর্ডার নোট..." value={address.note} onChange={(e) => setAddress((p) => ({ ...p, note: e.target.value }))} /></div>
+                <input className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition" placeholder="অর্ডার নোট..." value={address.note} onChange={(e) => setAddress((p) => ({ ...p, note: e.target.value }))} /></div>
             </div>
           </section>
 
@@ -129,23 +129,23 @@ export default function CheckoutPage() {
                   <span className="text-sm font-medium text-gray-900 whitespace-nowrap">৳ {Number(item?.total_price || 0).toFixed(2)}</span>
                 </div>
               ))}
-              <div className="flex justify-between items-center px-4 py-3 border-b border-dashed border-gray-300"><span className="text-sm text-[#388072] font-medium">Subtotal</span><span className="text-sm font-semibold text-gray-900">৳ {Number(totalPrice || 0).toFixed(2)}</span></div>
-              <div className="flex justify-between items-center px-4 py-3 bg-gray-50"><span className="text-base font-bold text-gray-900">Total</span><span className="text-lg font-bold text-[#388072]">৳ {Number((Number(totalPrice) || 0) + (Number(shippingCost) || 0)).toFixed(2)}</span></div>
+              <div className="flex justify-between items-center px-4 py-3 border-b border-dashed border-gray-300"><span className="text-sm text-[#012068] font-medium">Subtotal</span><span className="text-sm font-semibold text-gray-900">৳ {Number(totalPrice || 0).toFixed(2)}</span></div>
+              <div className="flex justify-between items-center px-4 py-3 bg-gray-50"><span className="text-base font-bold text-gray-900">Total</span><span className="text-lg font-bold text-[#012068]">৳ {Number((Number(totalPrice) || 0) + (Number(shippingCost) || 0)).toFixed(2)}</span></div>
             </div>
           </section>
 
           <section className="mb-8">
             {paymentMethods.map((method) => (
               <div key={method.id} className="mb-2" onClick={() => setPaymentMethodId(method.id)}>
-                <div className={`flex items-center gap-3 px-4 py-3 border rounded cursor-pointer transition ${paymentMethodId === method.id ? "border-[#388072] bg-[#388072]/5" : "border-gray-200"}`}>
-                  <input type="radio" name="payment" checked={paymentMethodId === method.id} onChange={() => setPaymentMethodId(method.id)} className="w-4 h-4 accent-[#388072]" />
+                <div className={`flex items-center gap-3 px-4 py-3 border rounded cursor-pointer transition ${paymentMethodId === method.id ? "border-[#012068] bg-[#012068]/5" : "border-gray-200"}`}>
+                  <input type="radio" name="payment" checked={paymentMethodId === method.id} onChange={() => setPaymentMethodId(method.id)} className="w-4 h-4 accent-[#012068]" />
                   <span className="text-sm font-medium text-gray-800">{method.name} (Pay with cash upon delivery.)</span>
                 </div>
               </div>
             ))}
           </section>
 
-          <button type="button" disabled={isCartEmpty} className={`w-full text-white font-bold py-4 rounded-lg shadow-md transition-all duration-200 flex items-center justify-center gap-2 text-base active:scale-[0.98] ${isCartEmpty ? "bg-gray-400 cursor-not-allowed" : "bg-[#388072] cursor-pointer"}`} onClick={submitOrder}>
+          <button type="button" disabled={isCartEmpty} className={`w-full text-white font-bold py-4 rounded-lg shadow-md transition-all duration-200 flex items-center justify-center gap-2 text-base active:scale-[0.98] ${isCartEmpty ? "bg-gray-400 cursor-not-allowed" : "bg-[#012068] cursor-pointer"}`} onClick={submitOrder}>
             <Icon icon="mdi:lock" className="w-5 h-5" />
             <span>Place Order ৳ {Number((Number(totalPrice) || 0) + (Number(shippingCost) || 0)).toFixed(2)}</span>
             {isOrderLoading && <Icon icon="nonicons:loading-16" className="w-5 h-5 animate-spin" />}
@@ -155,10 +155,10 @@ export default function CheckoutPage() {
 
       <Modal open={open} title={null} footer={null} centered width={500} onCancel={() => router.push("/")}>
         <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
-          <div className="w-20 h-20 rounded-full border-4 border-[#388072] flex items-center justify-center mb-6"><Icon icon="material-symbols:check" className="text-[#388072] w-14 h-14" /></div>
+          <div className="w-20 h-20 rounded-full border-4 border-[#012068] flex items-center justify-center mb-6"><Icon icon="material-symbols:check" className="text-[#012068] w-14 h-14" /></div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Your Order is Confirmed!</h1>
-          {saleCode && <p className="text-gray-600 text-lg mb-4">Order ID: <span className="font-bold text-[#388072]">#{saleCode}</span></p>}
-          <button onClick={() => router.push("/order-tracking")} className="bg-[#388072] text-white font-semibold py-3 px-8 rounded-md transition-colors duration-200 uppercase tracking-wide">Check status your order</button>
+          {saleCode && <p className="text-gray-600 text-lg mb-4">Order ID: <span className="font-bold text-[#012068]">#{saleCode}</span></p>}
+          <button onClick={() => router.push("/order-tracking")} className="bg-[#012068] text-white font-semibold py-3 px-8 rounded-md transition-colors duration-200 uppercase tracking-wide">Check status your order</button>
         </div>
       </Modal>
     </>
