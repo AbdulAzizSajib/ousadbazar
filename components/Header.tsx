@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
@@ -8,6 +8,10 @@ import { Badge } from 'antd';
 import { useCartStore } from '@/stores/cartStore';
 import { useSearchStore } from '@/stores/searchStore';
 import { formatNumber, asset } from '@/lib/config';
+import { useCategories } from '@/lib/hooks/useCategories';
+
+type NavItem = { id: string | number; name: string };
+type NavColumn = { title: string; items: NavItem[] };
 
 interface HeaderProps {
   isLoggedIn: boolean;
@@ -36,69 +40,30 @@ export default function Header({
   const mobileSearchInput = useRef<HTMLInputElement>(null);
   const lastScrollY = useRef(0);
 
-  const navMenus: Record<string, { title: string; items: string[] }[]> = {
-    Products: [
-      {
-        title: 'Personal Care',
-        items: ['Skin Care', 'Hair Care', 'Oral Care', 'Bath & Body', 'Men Grooming'],
-      },
-      {
-        title: 'Baby Care',
-        items: ['Diapers', 'Baby Food', 'Baby Skin Care', 'Baby Bath', 'Baby Accessories'],
-      },
-      {
-        title: 'Health Food',
-        items: ['Protein Supplements', 'Vitamins', 'Herbal Products', 'Nutrition Bars'],
-      },
-      {
-        title: 'Wellness',
-        items: ['Immunity Boosters', 'Weight Management', 'Sexual Wellness', 'Ayurveda'],
-      },
-    ],
-    Medicines: [
-      {
-        title: 'By Category',
-        items: [
-          'Pain Relief',
-          'Cold & Flu',
-          'Diabetes Care',
-          'Heart Care',
-          'Digestive Care',
-          'Antibiotics',
-        ],
-      },
-      {
-        title: 'Prescription',
-        items: ['Upload Prescription', 'Chronic Medicines', 'Refill Medicines'],
-      },
-      {
-        title: 'Popular Brands',
-        items: ['Square', 'Beximco', 'Incepta', 'Renata', 'ACI Pharma', 'Eskayef'],
-      },
-      {
-        title: 'Forms',
-        items: ['Tablets', 'Capsules', 'Syrups', 'Injections', 'Ointments', 'Drops'],
-      },
-    ],
-    Equipment: [
-      {
-        title: 'Diagnostic',
-        items: ['Thermometers', 'BP Monitors', 'Glucometers', 'Pulse Oximeter', 'Stethoscopes'],
-      },
-      {
-        title: 'Mobility Aids',
-        items: ['Wheelchairs', 'Walking Sticks', 'Crutches', 'Walkers'],
-      },
-      {
-        title: 'Respiratory',
-        items: ['Nebulizers', 'Oxygen Concentrators', 'CPAP Machines', 'Inhalers'],
-      },
-      {
-        title: 'Orthopedic',
-        items: ['Knee Support', 'Back Support', 'Ankle Support', 'Cervical Pillows'],
-      },
-    ],
-  };
+  const { data: categoriesData = [] } = useCategories();
+
+  const navMenus = useMemo<Record<string, NavColumn[]>>(() => {
+    const groups = new Map<string, NavItem[]>();
+    for (const cat of categoriesData) {
+      if (!cat?.ecom_cat_name) continue;
+      const arr = groups.get(cat.ecom_cat_name) ?? [];
+      arr.push({ id: cat.id, name: cat.name });
+      groups.set(cat.ecom_cat_name, arr);
+    }
+
+    const result: Record<string, NavColumn[]> = {};
+    for (const [parent, items] of groups) {
+      if (items.length === 0) continue;
+      const numCols = Math.min(4, items.length);
+      const chunkSize = Math.ceil(items.length / numCols);
+      const columns: NavColumn[] = [];
+      for (let i = 0; i < items.length; i += chunkSize) {
+        columns.push({ title: '', items: items.slice(i, i + chunkSize) });
+      }
+      result[parent] = columns;
+    }
+    return result;
+  }, [categoriesData]);
 
   const isSearchPage = pathname === '/search' || pathname === '/search/';
 
@@ -438,21 +403,26 @@ export default function Header({
         {openDropdown && navMenus[openDropdown] && (
        <div className="absolute left-0 right-0 top-full bg-gradient-to-b from-[#FFFFFF] to-[#EAEBF4] shadow-xl border-t border-gray-200 z-50">
             <div className="container mx-auto px-4 py-6 my-6">
+              <h3 className="text-sm font-bold text-[#012068] uppercase tracking-wide mb-4 pb-2 border-b border-gray-100">
+                {openDropdown}
+              </h3>
               <div className="grid grid-cols-4 gap-8">
-                {navMenus[openDropdown].map((column) => (
-                  <div key={column.title}>
-                    <h3 className="text-sm font-bold text-[#012068] uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
-                      {column.title}
-                    </h3>
+                {navMenus[openDropdown].map((column, idx) => (
+                  <div key={idx}>
+                    {column.title && (
+                      <h4 className="text-sm font-bold text-[#012068] uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
+                        {column.title}
+                      </h4>
+                    )}
                     <ul className="space-y-2">
                       {column.items.map((item) => (
-                        <li key={item}>
+                        <li key={item.id}>
                           <Link
-                            href={`/search?q=${encodeURIComponent(item)}`}
+                            href={`/search?q=${encodeURIComponent(item.name)}`}
                             onClick={() => setOpenDropdown(null)}
                             className="text-sm text-gray-700 hover:text-[#012068] hover:translate-x-1 inline-block transition-all duration-200"
                           >
-                            {item}
+                            {item.name}
                           </Link>
                         </li>
                       ))}

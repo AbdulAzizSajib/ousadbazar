@@ -1,7 +1,9 @@
 'use client';
 
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { useCategories } from '@/lib/hooks/useCategories';
 
 type IllustrationProps = { className?: string };
 
@@ -157,19 +159,19 @@ export type Category = {
   href?: string;
 };
 
-const defaultCategories: Category[] = [
-  { id: 1,  name: 'Medicine',        art: PillBottleArt,    href: '/category/medicine' },
-  { id: 2,  name: 'Vitamins',        art: CapsuleArt,       href: '/category/vitamins' },
-  { id: 3,  name: 'Personal Care',   art: SparkleBottleArt, href: '/category/personal-care' },
-  { id: 4,  name: 'Baby Care',       art: BabyBottleArt,    href: '/category/baby-care' },
-  { id: 5,  name: 'Devices',         art: StethoscopeArt,   href: '/category/devices' },
-  { id: 6,  name: 'Diabetes',        art: DropletArt,       href: '/category/diabetes' },
-  { id: 7,  name: 'First Aid',       art: FirstAidArt,      href: '/category/first-aid' },
-  { id: 8,  name: 'Nutrition',       art: NutritionArt,     href: '/category/nutrition' },
-  { id: 9,  name: 'Herbal',          art: HerbalArt,        href: '/category/herbal' },
-  { id: 10, name: 'Sexual Wellness', art: HeartPulseArt,    href: '/category/sexual-wellness' },
-  { id: 11, name: 'Home Care',       art: HouseCareArt,     href: '/category/home-care' },
-  { id: 12, name: 'Eye Care',        art: EyeCareArt,       href: '/category/eye-care' },
+const artRotation: ((props: IllustrationProps) => React.JSX.Element)[] = [
+  PillBottleArt,
+  CapsuleArt,
+  SparkleBottleArt,
+  BabyBottleArt,
+  StethoscopeArt,
+  DropletArt,
+  FirstAidArt,
+  NutritionArt,
+  HerbalArt,
+  HeartPulseArt,
+  HouseCareArt,
+  EyeCareArt,
 ];
 
 interface CategoryCarouselProps {
@@ -180,11 +182,31 @@ interface CategoryCarouselProps {
 }
 
 export default function CategoryCarousel({
-  categories = defaultCategories,
+  categories,
   title = 'Shop By Category',
   subtitle = 'Find exactly what your family needs',
   viewAllHref = '/categories',
 }: CategoryCarouselProps) {
+  const { data: apiCategories = [] } = useCategories();
+
+  const resolvedCategories = useMemo<Category[]>(() => {
+    if (categories && categories.length > 0) return categories;
+
+    const seen = new Map<number | string, { id: number | string; name: string }>();
+    for (const cat of apiCategories) {
+      if (!cat?.ecom_cat_id || !cat?.ecom_cat_name) continue;
+      if (!seen.has(cat.ecom_cat_id)) {
+        seen.set(cat.ecom_cat_id, { id: cat.ecom_cat_id, name: cat.ecom_cat_name });
+      }
+    }
+
+    return Array.from(seen.values()).map((parent, idx) => ({
+      id: parent.id,
+      name: parent.name,
+      art: artRotation[idx % artRotation.length],
+      href: `/search?q=${encodeURIComponent(parent.name)}`,
+    }));
+  }, [categories, apiCategories]);
   return (
     <section className="mt-10 md:mt-16 mb-6 md:mb-10">
       {/* Section header */}
@@ -201,19 +223,19 @@ export default function CategoryCarousel({
           </div>
         </div>
 
-        <Link
+        {/* <Link
           href={viewAllHref}
           className="group shrink-0 inline-flex items-center gap-1 text-xs sm:text-sm md:text-base font-semibold text-[#012068] hover:text-[#5360A7] transition-colors"
         >
           <span className="hidden sm:inline">View All</span>
           <span className="sm:hidden">All</span>
           <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </Link>
+        </Link> */}
       </div>
 
       {/* Category grid */}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5 sm:gap-3 md:gap-4">
-        {categories.map((cat) => {
+        {resolvedCategories.map((cat) => {
           const card = (
             <div className="group relative overflow-hidden flex flex-col items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 md:py-6 px-2 sm:px-3 rounded-xl sm:rounded-2xl bg-white ring-1 ring-[#012068]/10 hover:ring-[#012068]/30 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(1,32,104,0.35)] hover:-translate-y-1 transition-all duration-300 cursor-pointer">
               {/* Decorative accent */}
