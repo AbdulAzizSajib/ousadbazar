@@ -16,10 +16,12 @@ export interface StockBatch {
 }
 
 export interface Category {
+  id?: number;
   name: string;
 }
 
 export interface Supplier {
+  id?: number;
   company_name: string;
 }
 
@@ -28,7 +30,9 @@ export interface Product {
   name: string;
   generic_name?: string;
   category_name?: string;
+  category_id?: number;
   company_name?: string;
+  supplier_id?: number;
   category?: Category;
   supplier?: Supplier;
   product_prices?: ProductPrices;

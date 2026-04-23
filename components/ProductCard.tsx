@@ -173,7 +173,7 @@ export default function ProductCard({ item }: ProductCardProps) {
                   <Icon icon="tdesign:minus" className="h-3.5 w-3.5" />
                 </button>
                 <span className="flex-1 px-1 text-center text-[11px] font-medium leading-tight text-gray-800 dark:text-gray-100">
-                  {selectedPieces} {stripLabel} ({quantity} {stripCountLabel})
+                  {selectedPieces} {stripLabel} <br className="block md:hidden" /> ({quantity} {stripCountLabel})
                 </span>
                 <button
                   onClick={handleIncrease}

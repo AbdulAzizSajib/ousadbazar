@@ -3,18 +3,37 @@ import axios from 'axios';
 import { apiBasePharma } from '@/lib/config';
 import type { Product } from '@/types';
 
-export const useAllProductsInfinite = (sortBy: string = 'asc') => {
+export interface ProductFilters {
+  categoryId?: number | null;
+  supplierId?: number | null;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+}
+
+export const useAllProductsInfinite = (sortBy: string = 'asc', filters: ProductFilters = {}) => {
+  const { categoryId, supplierId, minPrice, maxPrice } = filters;
+
   return useInfiniteQuery({
-    queryKey: ['allProducts', sortBy],
+    queryKey: ['allProducts', sortBy, categoryId ?? null, supplierId ?? null, minPrice ?? null, maxPrice ?? null],
     queryFn: async ({ pageParam = 1 }) => {
+      const params = new URLSearchParams({
+        page: String(pageParam),
+        paginate: '20',
+        sort_by: sortBy,
+      });
+      if (categoryId != null) params.set('category_id', String(categoryId));
+      if (supplierId != null) params.set('supplier_id', String(supplierId));
+      if (minPrice != null) params.set('min_price', String(minPrice));
+      if (maxPrice != null) params.set('max_price', String(maxPrice));
+
       const res = await axios.get(
-        `${apiBasePharma}/products/best-selling-product?page=${pageParam}&paginate=20&sort_by=${sortBy}`
+        `${apiBasePharma}/products/best-selling-product?${params.toString()}`
       );
 
       const newProducts: Product[] = (res.data?.data || []).map((p: Record<string, unknown>) => ({
         ...p,
-        category: { name: p.category_name as string },
-        supplier: { company_name: p.company_name as string },
+        category: { id: p.category_id as number, name: p.category_name as string },
+        supplier: { id: p.supplier_id as number, company_name: p.company_name as string },
         product_prices: {
           selling_price: p.selling_price as number,
           ecom_final_selling_price:

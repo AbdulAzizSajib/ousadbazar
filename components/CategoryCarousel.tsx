@@ -159,6 +159,14 @@ export type Category = {
   href?: string;
 };
 
+const toSlug = (text: string) =>
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '') // special char remove
+    .replace(/\s+/g, '-')         // space → hyphen
+    .replace(/-+/g, '-');         // multiple hyphen fix
+
 const artRotation: ((props: IllustrationProps) => React.JSX.Element)[] = [
   PillBottleArt,
   CapsuleArt,
@@ -204,7 +212,8 @@ export default function CategoryCarousel({
       id: parent.id,
       name: parent.name,
       art: artRotation[idx % artRotation.length],
-      href: `/search?q=${encodeURIComponent(parent.name)}`,
+      // href: `/best-selling?categoryId=${encodeURIComponent(parent.id)}`,
+      href: `/best-selling/${toSlug(parent.name)}-${parent.id}`,
     }));
   }, [categories, apiCategories]);
   return (

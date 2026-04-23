@@ -5,43 +5,68 @@ import { Icon } from '@iconify/react';
 import { Drawer, Slider } from 'antd';
 import ProductCard from '@/components/ProductCard';
 import { useAllProductsInfinite } from '@/lib/hooks/useInfiniteProducts';
-import { useCategories } from '@/lib/hooks/useCategories';
+import { useChildCategories } from '@/lib/hooks/useChildCategories';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 type OptionItem = { id: number; name: string };
 
 const PRICE_SLIDER_MAX = 5000;
 
-export default function BestSellingIndexPage() {
+const prettifySlug = (text: string) =>
+  text
+    .replace(/-/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+export default function BestSellingClient() {
+
+  const params = useParams();
+
+  const slug = (params?.slug as string) || '';
+  const slugParts = slug.split('-');
+  const parsedParentId = Number(slugParts[slugParts.length - 1]);
+  const parentEcomCatId = Number.isFinite(parsedParentId) && parsedParentId > 0 ? parsedParentId : null;
+  const parentNameFromSlug = useMemo(
+    () => (slugParts.length > 1 ? prettifySlug(slugParts.slice(0, -1).join('-')) : ''),
+    [slug]
+  );
+
   const [sortBy, setSortBy] = useState('asc');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [minPrice, setMinPrice] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  // Price input drafts (debounced before firing API)
   const [minPriceInput, setMinPriceInput] = useState<string>('');
   const [maxPriceInput, setMaxPriceInput] = useState<string>('');
 
+  // Persisted supplier options (so options don't shrink when a filter is applied)
   const [supplierOptions, setSupplierOptions] = useState<OptionItem[]>([]);
 
-  // All categories (children across every parent) — /all-category returns a flat child list
-  const { data: apiCategories = [], isLoading: isLoadingCategories } = useCategories();
+  // Child categories for this parent — fetched from /all-category/{parentEcomCatId}
+  const { data: childCategories = [], isLoading: isLoadingChildren } = useChildCategories(
+    parentEcomCatId ?? 0
+  );
 
   const categoryOptions = useMemo<OptionItem[]>(() => {
-    const seen = new Map<number, { id: number; name: string }>();
-    for (const cat of apiCategories) {
-      if (!cat?.id || !cat?.name) continue;
-      const id = Number(cat.id);
-      if (!seen.has(id)) seen.set(id, { id, name: cat.name });
-    }
-    return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
-  }, [apiCategories]);
+    return childCategories
+      .filter((c) => c?.id && c?.name)
+      .map((c) => ({ id: Number(c.id), name: c.name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [childCategories]);
 
   const infiniteScrollTrigger = useRef<HTMLDivElement>(null);
 
+  // When no child is selected, filter products by the parent ecom_cat_id so only
+  // this parent's products load. Once a child is picked, filter by its id.
+  const effectiveCategoryId = selectedCategoryId ?? parentEcomCatId;
+
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useAllProductsInfinite(sortBy, {
-      categoryId: selectedCategoryId,
+      categoryId: effectiveCategoryId,
       supplierId: selectedSupplierId,
       minPrice,
       maxPrice,
@@ -49,6 +74,15 @@ export default function BestSellingIndexPage() {
 
   const allProduct = useMemo(() => data?.pages.flatMap((page) => page.products) ?? [], [data]);
 
+  const totalProducts = useMemo(() => data?.pages[0]?.total ?? 0, [data]);
+
+  // Reset child selection when the parent (URL) changes
+  useEffect(() => {
+    setSelectedCategoryId(null);
+  }, [parentEcomCatId]);
+
+  // Accumulate supplier options across requests (dedupe by id, keep stable sorted list).
+  // Category options come from useChildCategories, not from product responses.
   useEffect(() => {
     if (allProduct.length === 0) return;
     setSupplierOptions((prev) => {
@@ -62,6 +96,7 @@ export default function BestSellingIndexPage() {
     });
   }, [allProduct]);
 
+  // Debounce price inputs → commit to filter after 500ms idle
   useEffect(() => {
     const t = setTimeout(() => {
       setMinPrice(minPriceInput ? Number(minPriceInput) : null);
@@ -75,6 +110,7 @@ export default function BestSellingIndexPage() {
     return () => clearTimeout(t);
   }, [maxPriceInput]);
 
+  // Server handles filtering — just use what came back
   const filteredProducts = allProduct;
 
   const activeFilterCount =
@@ -158,11 +194,11 @@ export default function BestSellingIndexPage() {
             </button>
           )}
         </div>
-        <div className="grid gap-2 max-h-[240px] overflow-y-auto pr-1">
-          {isLoadingCategories && (
+        <div className="grid gap-2 max-h-[220px] overflow-y-auto pr-1">
+          {isLoadingChildren && (
             <p className="text-xs text-gray-400">Loading categories…</p>
           )}
-          {!isLoadingCategories && categoryOptions.length === 0 && (
+          {!isLoadingChildren && categoryOptions.length === 0 && (
             <p className="text-xs text-gray-400">No categories available</p>
           )}
           {categoryOptions.map((category) => (
@@ -255,7 +291,25 @@ export default function BestSellingIndexPage() {
           Home
         </Link>
         <Icon icon="mdi:chevron-right" className="w-4 h-4 text-gray-300" />
-        <span className="text-gray-900 font-medium">Best Selling</span>
+        <Link href="/best-selling" className="text-gray-500 hover:text-[#012068] transition-colors">
+          Best Selling
+        </Link>
+        {parentNameFromSlug && (
+          <>
+            <Icon icon="mdi:chevron-right" className="w-4 h-4 text-gray-300" />
+            <span className={selectedCategoryId ? 'text-gray-500' : 'text-gray-900 font-medium'}>
+              {parentNameFromSlug}
+            </span>
+          </>
+        )}
+        {selectedCategoryId && (
+          <>
+            <Icon icon="mdi:chevron-right" className="w-4 h-4 text-gray-300" />
+            <span className="text-gray-900 font-medium">
+              {categoryOptions.find((c) => c.id === selectedCategoryId)?.name || 'Category'}
+            </span>
+          </>
+        )}
       </nav>
 
       <div className="grid grid-cols-1 md:grid-cols-[290px_1fr] xl:grid-cols-[290px_1fr] gap-4 items-start">
@@ -282,6 +336,7 @@ export default function BestSellingIndexPage() {
         <div className="flex-1 min-w-0 ">
           {/* Top controls bar */}
           <div className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 mb-3 flex justify-between items-center gap-3 md:hidden">
+            {/* Mobile filter button */}
             <button
               type="button"
               onClick={() => setMobileFilterOpen(true)}
@@ -307,6 +362,15 @@ export default function BestSellingIndexPage() {
                 <option value="desc">Descending</option>
               </select>
             </div>
+
+            {/* <div className="hidden sm:block text-sm text-gray-600 text-right">
+              <span className="font-semibold text-gray-900">
+                {filteredProducts.length}
+              </span>{" "}
+              /{" "}
+              <span className="font-semibold text-gray-900">{totalProducts}</span>{" "}
+              Total
+            </div> */}
           </div>
 
           <div className="mb-3">
