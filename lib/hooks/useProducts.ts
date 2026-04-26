@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { apiBasePharma } from "@/lib/config";
 
@@ -74,6 +74,37 @@ export const useProductIds = (maxPages: number = 500) => {
       return Array.from(ids);
     },
     staleTime: 60 * 60 * 1000, // 1 hour for static generation
+  });
+};
+
+export const useProductsByGeneric = (
+  genericId: string | number | undefined | null,
+  perPage: number = 10
+) => {
+  return useInfiniteQuery({
+    queryKey: ["productsByGeneric", genericId, perPage],
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await axios.get(
+        `${apiBasePharma}/products/product-generic-wise/${genericId}?page=${pageParam}&per_page=${perPage}`
+      );
+      const payload = res?.data ?? {};
+      const data = Array.isArray(payload?.data)
+        ? payload.data
+        : Array.isArray(payload)
+          ? payload
+          : [];
+      return {
+        data,
+        currentPage: Number(payload?.current_page ?? pageParam),
+        lastPage: Number(payload?.last_page ?? pageParam),
+        total: Number(payload?.total ?? data.length),
+      };
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.currentPage < lastPage.lastPage ? lastPage.currentPage + 1 : undefined,
+    enabled: !!genericId,
+    staleTime: 10 * 60 * 1000,
   });
 };
 

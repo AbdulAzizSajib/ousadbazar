@@ -5,104 +5,29 @@ import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { imgBasePharma, asset } from "@/lib/config";
 import { useCartStore } from "@/stores/cartStore";
-import { useProduct } from "@/lib/hooks/useProducts";
+import { useProduct, useProductsByGeneric } from "@/lib/hooks/useProducts";
 import { getUnitInfo } from "@/lib/unitUtils";
+import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/types";
 
 interface ProductDetailClientProps {
   id: string;
 }
 
-// Fake alternative medicines (replace with API data later)
-const ALTERNATIVE_MEDICINES = [
-  {
-    id: "alt-1",
-    name: "Napa Extra",
-    generic: "Paracetamol + Caffeine",
-    company: "Beximco Pharmaceuticals",
-    packsize: "500mg + 65mg",
-    price: 2.5,
-    oldPrice: 3.0,
-    rating: 4.8,
-    reviews: 1240,
-    image: "https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&h=400&fit=crop",
-    gradient: "from-sky-100 to-blue-50",
-    accent: "bg-blue-500",
-  },
-  {
-    id: "alt-2",
-    name: "Ace Plus",
-    generic: "Paracetamol + Caffeine",
-    company: "Square Pharmaceuticals",
-    packsize: "500mg + 65mg",
-    price: 2.7,
-    oldPrice: 3.2,
-    rating: 4.7,
-    reviews: 980,
-    image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=400&fit=crop",
-    gradient: "from-emerald-100 to-green-50",
-    accent: "bg-emerald-500",
-  },
-  {
-    id: "alt-3",
-    name: "Fast",
-    generic: "Paracetamol",
-    company: "ACI Limited",
-    packsize: "500mg",
-    price: 1.8,
-    oldPrice: 2.2,
-    rating: 4.6,
-    reviews: 2150,
-    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop",
-    gradient: "from-rose-100 to-pink-50",
-    accent: "bg-rose-500",
-  },
-  {
-    id: "alt-4",
-    name: "Reset",
-    generic: "Paracetamol",
-    company: "Eskayef Pharmaceuticals",
-    packsize: "500mg",
-    price: 2.0,
-    oldPrice: 2.5,
-    rating: 4.5,
-    reviews: 760,
-    image: "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400&h=400&fit=crop",
-    gradient: "from-amber-100 to-yellow-50",
-    accent: "bg-amber-500",
-  },
-  {
-    id: "alt-5",
-    name: "Renova",
-    generic: "Paracetamol",
-    company: "Incepta Pharmaceuticals",
-    packsize: "500mg",
-    price: 1.9,
-    oldPrice: 2.3,
-    rating: 4.4,
-    reviews: 540,
-    image: "https://images.unsplash.com/photo-1576602976047-174e57a47881?w=400&h=400&fit=crop",
-    gradient: "from-violet-100 to-purple-50",
-    accent: "bg-violet-500",
-  },
-  {
-    id: "alt-6",
-    name: "Xcel",
-    generic: "Paracetamol",
-    company: "Drug International",
-    packsize: "500mg",
-    price: 1.75,
-    oldPrice: 2.1,
-    rating: 4.3,
-    reviews: 410,
-    image: "https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400&h=400&fit=crop",
-    gradient: "from-teal-100 to-cyan-50",
-    accent: "bg-teal-500",
-  },
-];
-
 export default function ProductDetailClient({ id }: ProductDetailClientProps) {
   const { data: productDetail, isLoading: loading } = useProduct(id);
+  const genericId = productDetail?.generic_id as string | number | undefined;
+  const {
+    data: alternativesData,
+    isLoading: alternativesLoading,
+    fetchNextPage: fetchMoreAlternatives,
+    hasNextPage: hasMoreAlternatives,
+    isFetchingNextPage: loadingMoreAlternatives,
+  } = useProductsByGeneric(genericId);
+  const alternatives: Product[] = (alternativesData?.pages ?? [])
+    .flatMap((p) => (p?.data ?? []) as Product[])
+    .filter((p) => String(p?.id) !== String(id));
+  const alternativesTotal = alternativesData?.pages?.[0]?.total ?? 0;
   const getCart = useCartStore((s) => s.getCart);
   const [zoomed, setZoomed] = useState(false);
   const [loadingItemId, setLoadingItemId] = useState<string | number | null>(null);
@@ -565,109 +490,100 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
         </div>
 
         {/* Alternative Medicines Section */}
-        <section className="mb-6">
-          <div className="flex items-end justify-between mb-4 px-1">
-            <div>
-              <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[#012068] bg-[#012068]/10 px-2.5 py-1 rounded-full mb-2">
-                <Icon icon="mdi:pill-multiple" className="w-3.5 h-3.5" />
-                Same Generic Alternatives
-              </div>
-              <h2 className="text-lg md:text-2xl font-bold text-gray-900">
-                Alternative Medicines
-              </h2>
-              <p className="text-xs md:text-sm text-gray-500 mt-1">
-                Same active ingredient, different brands — compare and choose your best option.
-              </p>
-            </div>
-            <Link
-              href="/all-medicines"
-              className="hidden md:inline-flex items-center gap-1 text-sm font-medium text-[#012068] hover:gap-2 transition-all"
-            >
-              View all
-              <Icon icon="mdi:arrow-right" className="w-4 h-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4">
-            {ALTERNATIVE_MEDICINES.map((med) => {
-              const disc = Math.round(((med.oldPrice - med.price) / med.oldPrice) * 100);
-              return (
-                <div
-                  key={med.id}
-                  className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#012068]/30 transition-all duration-300 overflow-hidden flex flex-col"
-                >
-                  {/* Image */}
-                  <div
-                    className={`relative aspect-square bg-gradient-to-br ${med.gradient} p-4 overflow-hidden`}
-                  >
-                    <img
-                      src={med.image}
-                      alt={med.name}
-                      className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-110"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = asset("/images/default.jpg");
-                      }}
-                    />
-                    {disc > 0 && (
-                      <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
-                        -{disc}%
-                      </span>
-                    )}
-                    <span
-                      className={`absolute top-2 right-2 ${med.accent} text-white text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded shadow-sm`}
-                    >
-                      Alt
-                    </span>
-                  </div>
-
-                  {/* Details */}
-                  <div className="p-3 md:p-4 flex flex-col flex-1">
-                    <p className="text-[10px] text-gray-500 truncate mb-0.5">{med.company}</p>
-                    <h3 className="font-bold text-gray-900 text-sm md:text-base leading-tight line-clamp-1 group-hover:text-[#012068] transition-colors">
-                      {med.name}
-                    </h3>
-                    <p className="text-[11px] text-gray-600 line-clamp-1 mt-0.5">{med.generic}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">{med.packsize}</p>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-1 mt-2">
-                      <Icon icon="mdi:star" className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="text-[11px] font-medium text-gray-700">{med.rating}</span>
-                      <span className="text-[10px] text-gray-400">({med.reviews})</span>
-                    </div>
-
-                    {/* Price */}
-                    <div className="flex items-baseline gap-1.5 mt-2">
-                      <span className="text-base md:text-lg font-bold text-[#012068]">
-                        ৳{med.price.toFixed(2)}
-                      </span>
-                      {med.oldPrice > med.price && (
-                        <span className="text-xs text-gray-400 line-through">
-                          ৳{med.oldPrice.toFixed(2)}
-                        </span>
-                      )}
-                    </div>
-
-                    <button className="mt-3 w-full flex items-center justify-center gap-1.5 bg-[#012068]/5 hover:bg-[#012068] text-[#012068] hover:text-white border border-[#012068]/20 hover:border-[#012068] font-semibold text-xs py-2 rounded-lg transition-colors">
-                      <Icon icon="solar:cart-plus-bold" className="w-3.5 h-3.5" />
-                      Add to Cart
-                    </button>
-                  </div>
+        {(alternativesLoading || alternatives.length > 0) && (
+          <section className="mb-6">
+            <div className="flex items-end justify-between mb-4 px-1">
+              <div>
+                <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[#012068] bg-[#012068]/10 px-2.5 py-1 rounded-full mb-2">
+                  <Icon icon="mdi:pill-multiple" className="w-3.5 h-3.5" />
+                  Same Generic Alternatives
                 </div>
-              );
-            })}
-          </div>
+                <h2 className="text-lg md:text-2xl font-bold text-gray-900">
+                  Alternative Medicines
+                </h2>
+                <p className="text-xs md:text-sm text-gray-500 mt-1">
+                  {productDetail?.generic_name ? (
+                    <>
+                      Other brands containing{" "}
+                      <span className="font-medium text-[#012068]">
+                        {String(productDetail.generic_name)}
+                      </span>{" "}
+                      — compare and choose your best option.
+                    </>
+                  ) : (
+                    "Same active ingredient, different brands — compare and choose your best option."
+                  )}
+                </p>
+              </div>
+              {/* {productDetail?.generic_name ? (
+                <Link
+                  href={`/all-medicines?generic_id=${genericId}`}
+                  className="hidden md:inline-flex items-center gap-1 text-sm font-medium text-[#012068] hover:gap-2 transition-all"
+                >
+                  View all
+                  <Icon icon="mdi:arrow-right" className="w-4 h-4" />
+                </Link>
+              ) : null}  */}
+            </div>
 
-          <div className="md:hidden mt-4 text-center">
-            <Link
-              href="/all-medicines"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#012068]"
-            >
-              View all alternatives
-              <Icon icon="mdi:arrow-right" className="w-4 h-4" />
-            </Link>
-          </div>
-        </section>
+            {alternativesLoading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="animate-pulse rounded-xl border border-gray-100 bg-white overflow-hidden"
+                  >
+                    <div className="aspect-square bg-gray-200" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-3 w-2/3 bg-gray-200 rounded" />
+                      <div className="h-3 w-1/2 bg-gray-200 rounded" />
+                      <div className="h-8 w-full bg-gray-200 rounded mt-2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4">
+                  {alternatives.map((alt) => (
+                    <ProductCard key={alt.id} item={alt} />
+                  ))}
+                </div>
+
+                {hasMoreAlternatives && (
+                  <div className="mt-5 flex flex-col items-center gap-1">
+                    <button
+                      onClick={() => fetchMoreAlternatives()}
+                      disabled={loadingMoreAlternatives}
+                      className="inline-flex items-center gap-2 rounded-xl border border-[#012068]/20 bg-white px-5 py-2.5 text-sm font-semibold text-[#012068] shadow-sm hover:border-[#012068] hover:bg-[#012068] hover:text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {loadingMoreAlternatives ? (
+                        <>
+                          <Icon
+                            icon="mingcute:loading-line"
+                            className="w-4 h-4 animate-spin"
+                          />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <Icon icon="mdi:plus-circle-outline" className="w-4 h-4" />
+                          See More
+                          <Icon icon="mdi:chevron-down" className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                    {alternativesTotal > 0 && (
+                      <p className="text-[11px] text-gray-400">
+                        Showing {alternatives.length} of {alternativesTotal - 1}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </section>
+        )}
 
         {/* Description Section */}
         <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
