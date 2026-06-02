@@ -15,7 +15,7 @@ interface LoginModalProps {
 export default function LoginModal({ open, onClose, onLoginSuccess }: LoginModalProps) {
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
+  const [otpDigits, setOtpDigits] = useState(["", "", "", ""]);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [resendTimer, setResendTimer] = useState(0);
   const resendInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -39,7 +39,7 @@ export default function LoginModal({ open, onClose, onLoginSuccess }: LoginModal
     const newDigits = [...otpDigits];
     newDigits[index] = digit;
     setOtpDigits(newDigits);
-    if (digit && index < 5) otpRefs.current[index + 1]?.focus();
+    if (digit && index < 3) otpRefs.current[index + 1]?.focus();
   };
 
   const handleOtpBackspace = (index: number) => {
@@ -48,16 +48,16 @@ export default function LoginModal({ open, onClose, onLoginSuccess }: LoginModal
 
   const handleOtpPaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const paste = (e.clipboardData?.getData("text") || "").replace(/\D/g, "").slice(0, 6);
+    const paste = (e.clipboardData?.getData("text") || "").replace(/\D/g, "").slice(0, 4);
     const newDigits = [...otpDigits];
     paste.split("").forEach((char, i) => { newDigits[i] = char; });
     setOtpDigits(newDigits);
-    otpRefs.current[Math.min(paste.length, 5)]?.focus();
+    otpRefs.current[Math.min(paste.length, 3)]?.focus();
   };
 
   const resetOtp = () => {
     setOtpSent(false);
-    setOtpDigits(["", "", "", "", "", ""]);
+    setOtpDigits(["", "", "", ""]);
     if (resendInterval.current) clearInterval(resendInterval.current);
     setResendTimer(0);
   };
@@ -65,7 +65,7 @@ export default function LoginModal({ open, onClose, onLoginSuccess }: LoginModal
   const handleCancel = () => {
     setPhone("");
     setOtpSent(false);
-    setOtpDigits(["", "", "", "", "", ""]);
+    setOtpDigits(["", "", "", ""]);
     if (resendInterval.current) clearInterval(resendInterval.current);
     setResendTimer(0);
     onClose();
@@ -95,7 +95,7 @@ export default function LoginModal({ open, onClose, onLoginSuccess }: LoginModal
 
   const handleVerifyOtp = () => {
     const otp = otpDigits.join("");
-    if (otp.length < 6) return showNotification("warning", "Please enter the full 6-digit OTP");
+    if (otp.length < 4) return showNotification("warning", "Please enter the full 4-digit OTP");
     verifyOtp(
       { phone: `88${phone}`, otp },
       {
@@ -237,8 +237,8 @@ export default function LoginModal({ open, onClose, onLoginSuccess }: LoginModal
             {otpSent && (
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Enter OTP</label>
-                <p className="text-xs text-gray-400 mb-3">A 6-digit code has been sent to +88{phone}</p>
-                <div className="flex justify-between gap-2">
+                <p className="text-xs text-gray-400 mb-3">A 4-digit code has been sent to +88{phone}</p>
+                <div className="flex items-center gap-2">
                   {otpDigits.map((digit, i) => (
                     <input
                       key={i}

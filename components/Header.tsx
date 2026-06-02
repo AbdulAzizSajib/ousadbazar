@@ -39,6 +39,24 @@ export default function Header({
   const navSearchInput = useRef<HTMLInputElement>(null);
   const mobileSearchInput = useRef<HTMLInputElement>(null);
   const lastScrollY = useRef(0);
+  const [searchInput, setSearchInput] = useState(searchStore.searchQuery);
+
+  useEffect(() => {
+    setSearchInput(searchStore.searchQuery);
+  }, [searchStore.searchQuery]);
+
+  useEffect(() => {
+    if (searchInput === searchStore.searchQuery) return;
+    const t = setTimeout(() => {
+      searchStore.search(searchInput);
+      if (searchInput) {
+        router.replace(`/search?q=${encodeURIComponent(searchInput)}`);
+      } else {
+        router.replace('/search');
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
 
   const { data: categoriesData = [] } = useCategories();
 
@@ -161,17 +179,15 @@ export default function Header({
                     <input
                       ref={navSearchInput}
                       type="text"
-                      value={searchStore.searchQuery}
-                      onChange={(e) => {
-                        searchStore.search(e.target.value);
-                        router.replace(`/search?q=${encodeURIComponent(e.target.value)}`);
-                      }}
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
                       placeholder="Search for medicine, brand, symptom..."
                       className="flex-1 px-3 py-2.5 bg-transparent outline-none text-sm text-gray-700 placeholder-gray-400"
                     />
-                    {searchStore.searchQuery && (
+                    {searchInput && (
                       <button
                         onClick={() => {
+                          setSearchInput('');
                           searchStore.clearSearch();
                           router.replace('/search');
                         }}
@@ -337,17 +353,15 @@ export default function Header({
               <input
                 ref={mobileSearchInput}
                 type="text"
-                value={searchStore.searchQuery}
-                onChange={(e) => {
-                  searchStore.search(e.target.value);
-                  router.replace(`/search?q=${encodeURIComponent(e.target.value)}`);
-                }}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search medicines..."
                 className="flex-1 px-3 py-2.5 bg-transparent outline-none text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400"
               />
-              {searchStore.searchQuery && (
+              {searchInput && (
                 <button
                   onClick={() => {
+                    setSearchInput('');
                     searchStore.clearSearch();
                     router.replace('/search');
                   }}

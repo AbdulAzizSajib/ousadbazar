@@ -120,6 +120,34 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'cart-storage',
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        const items = state.cartProduct;
+        const isTampered =
+          !Array.isArray(items) ||
+          items.some(
+            (it) =>
+              !it ||
+              typeof it !== 'object' ||
+              typeof it.price !== 'number' ||
+              typeof it.quantity !== 'number' ||
+              typeof it.total_price !== 'number' ||
+              it.quantity <= 0 ||
+              it.price < 0 ||
+              Math.abs(it.total_price - it.price * it.quantity) > 0.01
+          ) ||
+          Math.abs(
+            (state.totalPrice || 0) -
+              items.reduce((s, it) => s + (it?.total_price || 0), 0)
+          ) > 0.01;
+
+        if (isTampered) {
+          state.resetCart();
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('cart-storage');
+          }
+        }
+      },
     }
   )
 );

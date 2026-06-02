@@ -8,12 +8,14 @@ import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import LoginModal from '@/components/LoginModal';
 import { showNotification } from '@/lib/notification';
+import { useCartStore } from '@/stores/cartStore';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const resetCart = useCartStore((state) => state.resetCart);
 
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem('token'));
@@ -21,6 +23,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     localStorage.clear();
+    resetCart();
     setIsLoggedIn(false);
     showNotification('success', 'Logged Out!');
     router.push('/');

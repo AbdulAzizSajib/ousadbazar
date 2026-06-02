@@ -21,7 +21,7 @@ function getContainer(): HTMLDivElement {
   containerEl = document.createElement("div");
   containerEl.id = "ousad-notifications";
   containerEl.style.cssText =
-    "position:fixed;top:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:380px;width:100%;";
+    "position:fixed;bottom:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:380px;width:100%;";
   document.body.appendChild(containerEl);
   return containerEl;
 }
