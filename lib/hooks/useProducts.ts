@@ -121,18 +121,28 @@ export const useSearchProducts = (query: string, page: number = 1) => {
 
       return results.map((item: Record<string, unknown>) => {
         const p = (item._source as Record<string, unknown>) || item;
+        const apiDiscountPct =
+          (p.ecom_discount_percentage as number | null | undefined) ??
+          (p.product_prices as { ecom_discount_percentage?: number })?.ecom_discount_percentage ??
+          null;
         return {
           id: p.id,
           name: p.name,
           generic_name: p.generic_name,
           category: { name: p.category_name || (p.category as { name?: string })?.name || "N/A" },
+          category_name: p.category_name,
           supplier: { company_name: p.company_name || (p.supplier as { company_name?: string })?.company_name || "N/A" },
+          selling_price: p.selling_price,
+          ecom_discount_percentage: apiDiscountPct,
+          packsize_quantity: p.packsize_quantity,
+          packsize_name: p.packsize_name,
+          stripe_qty: p.stripe_qty,
           product_prices: {
             selling_price: p.selling_price || (p.product_prices as { selling_price?: number })?.selling_price || 0,
             ecom_final_selling_price: p.selling_price || (p.product_prices as { ecom_final_selling_price?: number })?.ecom_final_selling_price || 0,
-            ecom_discount_percentage: (p.product_prices as { ecom_discount_percentage?: number })?.ecom_discount_percentage || null,
-            pack_quantity: (p.product_prices as { pack_quantity?: number })?.pack_quantity || 1,
-            ecom_pack_name: (p.product_prices as { ecom_pack_name?: { name: string } })?.ecom_pack_name || { name: "Pcs" },
+            ecom_discount_percentage: apiDiscountPct,
+            pack_quantity: p.packsize_quantity || (p.product_prices as { pack_quantity?: number })?.pack_quantity || 1,
+            ecom_pack_name: (p.product_prices as { ecom_pack_name?: { name: string } })?.ecom_pack_name || { name: (p.packsize_name as string) || "Pcs" },
           },
           product_images: (p.product_images as { path: string }[]) || [],
           path: (p.path as string) || null,

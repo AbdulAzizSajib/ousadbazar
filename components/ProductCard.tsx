@@ -22,10 +22,15 @@ export default function ProductCard({ item }: ProductCardProps) {
   const stock = unit.unitStock;
   const finalPrice = unit.unitPrice;
   const perUnitSellingPrice = unit.unitSellingPrice;
-  const hasDiscount = perUnitSellingPrice > finalPrice;
-  const discountPct = hasDiscount
-    ? Math.round(((perUnitSellingPrice - finalPrice) / perUnitSellingPrice) * 100)
-    : 0;
+  const apiDiscountPct = Number(item?.ecom_discount_percentage ?? 0);
+  const hasDiscount =
+    stock > 0 && (apiDiscountPct > 0 || perUnitSellingPrice > finalPrice);
+  const discountPct =
+    apiDiscountPct > 0
+      ? apiDiscountPct
+      : hasDiscount
+      ? Math.round(((perUnitSellingPrice - finalPrice) / perUnitSellingPrice) * 100)
+      : 0;
   const categoryName = item?.category?.name || item?.category_name || '';
   const stripLabel = item?.category_name || unit.unitLabelPlural;
   const totalPrice = (quantity * finalPrice).toFixed(2);
@@ -123,6 +128,11 @@ export default function ProductCard({ item }: ProductCardProps) {
           )}
 
           <div className="mt-2 flex items-baseline gap-1.5">
+            {hasDiscount && (
+              <span className="font-mono text-[12px] tabular-nums text-gray-600 line-through">
+                ৳{perUnitSellingPrice.toFixed(2)}
+              </span>
+            )}
             <span className="font-mono text-[15px] font-semibold tabular-nums tracking-tight text-gray-900 dark:text-gray-100">
               ৳ {finalPrice.toFixed(2)}
             </span>
