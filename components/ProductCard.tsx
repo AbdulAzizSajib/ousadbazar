@@ -127,12 +127,14 @@ export default function ProductCard({ item }: ProductCardProps) {
             </div>
           )}
 
-          <div className="mt-2 flex items-baseline gap-1.5">
-            {hasDiscount && (
-              <span className="font-mono text-[12px] tabular-nums text-gray-600 line-through">
+          <div className="mt-2 flex items-center justify-between gap-1.5">
+           <span>
+             {hasDiscount && (
+              <span className="font-mono text-[15px] tabular-nums text-gray-600 line-through decoration-red-500 decoration-2">
                 ৳{perUnitSellingPrice.toFixed(2)}
               </span>
             )}
+           </span>
             <span className="font-mono text-[15px] font-semibold tabular-nums tracking-tight text-gray-900 dark:text-gray-100">
               ৳ {finalPrice.toFixed(2)}
             </span>
