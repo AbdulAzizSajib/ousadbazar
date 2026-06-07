@@ -15,8 +15,11 @@ interface ProductCardProps {
 
 export default function ProductCard({ item }: ProductCardProps) {
   const getCart = useCartStore((s) => s.getCart);
+  const cartQuantity = useCartStore(
+    (s) => s.cartProduct.find((p) => p?.id == item?.id)?.quantity ?? 0
+  );
   const [loadingItemId, setLoadingItemId] = useState<string | number | null>(null);
-  const [quantity, setQuantity] = useState(0); // 0 = not added yet
+  const quantity = cartQuantity;
 
   const unit = getUnitInfo(item);
   const stock = unit.unitStock;
@@ -40,7 +43,6 @@ export default function ProductCard({ item }: ProductCardProps) {
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     const newQty = 1;
-    setQuantity(newQty);
     setLoadingItemId(item.id);
     try {
       getCart(item, newQty, newQty * unit.piecesPerUnit);
@@ -53,18 +55,19 @@ export default function ProductCard({ item }: ProductCardProps) {
     e.preventDefault();
     if (quantity >= stock) return;
     const newQty = quantity + 1;
-    setQuantity(newQty);
     getCart(item, newQty, newQty * unit.piecesPerUnit);
   };
 
   const handleDecrease = (e: React.MouseEvent) => {
     e.preventDefault();
     if (quantity <= 1) {
-      setQuantity(0);
+      const idx = useCartStore
+        .getState()
+        .cartProduct.findIndex((p) => p?.id == item?.id);
+      if (idx !== -1) useCartStore.getState().removeProductFromCart(idx);
       return;
     }
     const newQty = quantity - 1;
-    setQuantity(newQty);
     getCart(item, newQty, newQty * unit.piecesPerUnit);
   };
 
@@ -81,7 +84,7 @@ export default function ProductCard({ item }: ProductCardProps) {
             src={`${imgBasePharma}/${item?.path}`}
             alt={item?.name}
             onError={(e) => {
-              (e.target as HTMLImageElement).src = asset('/images/default.jpg');
+              (e.target as HTMLImageElement).src = asset('/images/placeholder.svg');
             }}
           />
           <span className="absolute left-2 top-2 rounded-full border border-gray-200 bg-[#F4F5F9] px-2.5 py-0.5 text-[10px] font-medium text-gray-600 backdrop-blur-sm dark:border-gray-600/60 dark:bg-gray-800/80 dark:text-gray-300">

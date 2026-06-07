@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,14 +19,32 @@ export default function SearchPage() {
 }
 
 function SearchContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const { data: searchData = [], isLoading } = useSearchProducts(query);
-  const { search } = useSearchStore();
+  const {
+    search,
+    searchHistory,
+    saveSearchHistory,
+    removeSearchHistory,
+    clearSearchHistory,
+  } = useSearchStore();
 
   useEffect(() => {
     search(query);
-  }, [query]);
+  }, [query, search]);
+
+  useEffect(() => {
+    const normalized = query.trim();
+    if (!normalized) return;
+
+    const timeout = setTimeout(() => {
+      saveSearchHistory(normalized);
+    }, 700);
+
+    return () => clearTimeout(timeout);
+  }, [query, saveSearchHistory]);
 
   return (
     <section className="w-full min-h-screen py-6 px-3 md:px-0">
@@ -66,7 +85,7 @@ function SearchContent() {
                   src={`${imgBasePharma}/${item?.path}`}
                   alt={item?.name}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = asset("/images/default.jpg");
+                    (e.target as HTMLImageElement).src = asset("/images/placeholder.svg");
                   }}
                 />
               </div>
@@ -104,10 +123,56 @@ function SearchContent() {
       )}
 
       {!query && (
-        <div className="flex flex-col items-center justify-center py-20">
-          <Icon icon="mingcute:search-line" className="w-16 h-16 text-gray-300 mb-4" />
-          <p className="text-lg text-gray-500">Search for products</p>
-          <p className="text-sm text-gray-400 mt-1">Type a product name to get started</p>
+        <div className="mx-auto w-full max-w-3xl rounded-2xl border border-gray-100 bg-white p-6 md:p-8">
+          <div className="flex flex-col items-center justify-center text-center">
+            <Icon icon="mingcute:search-line" className="mb-4 h-14 w-14 text-gray-300" />
+            <p className="text-lg font-semibold text-gray-700">Search for products</p>
+            <p className="mt-1 text-sm text-gray-500">Type a product name to get started</p>
+          </div>
+
+          <div className="mt-8 border-t border-gray-100 pt-5">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-700">Recent searches</h3>
+              {searchHistory.length > 0 && (
+                <button
+                  type="button"
+                  onClick={clearSearchHistory}
+                  className="text-xs font-medium text-gray-500 transition-colors hover:text-gray-700"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
+
+            {searchHistory.length === 0 ? (
+              <p className="text-sm text-gray-400">Your recent searches will appear here.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {searchHistory.map((term) => (
+                  <div
+                    key={term}
+                    className="group inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/search?q=${encodeURIComponent(term)}`)}
+                      className="text-sm text-gray-700 transition-colors hover:text-gray-900"
+                    >
+                      {term}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Remove ${term} from search history`}
+                      onClick={() => removeSearchHistory(term)}
+                      className="text-gray-400 transition-colors hover:text-gray-600"
+                    >
+                      <Icon icon="mdi:close" className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </section>

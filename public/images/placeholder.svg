@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="12" fill="#F3F4F6" />
+  <g transform="translate(80,60)" fill="#D1D5DB">
+    <rect width="240" height="180" rx="8" />
+    <path d="M32 48c8-12 24-20 40-20s32 8 40 20l32 48H0l32-48z" fill="#E5E7EB" />
+  </g>
+  <text x="200" y="270" font-family="Inter, Arial, sans-serif" font-size="14" fill="#9CA3AF" text-anchor="middle">Image</text>
+</svg>

@@ -165,7 +165,7 @@ export default function CartDrawer({ visible, onClose }: CartDrawerProps) {
                               src={`${imgBasePharma}/${product.product_images[0]?.path}`}
                               alt={product.name}
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = asset('/images/default.jpg');
+                                (e.target as HTMLImageElement).src = asset('/images/placeholder.svg');
                               }}
                             />
                           ) : (

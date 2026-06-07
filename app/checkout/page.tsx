@@ -134,7 +134,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="w-16 h-16 flex-shrink-0 bg-gray-50 rounded border border-gray-200 overflow-hidden">
                       {item?.product_images && item.product_images.length > 0 ? (
-                        <img width={64} height={64} className="w-full h-full object-cover" src={`${imgBasePharma}/${item.product_images[0]?.path}`} alt={item.name} onError={(e) => { (e.target as HTMLImageElement).src = asset("/images/default.jpg"); }} />
+                        <img width={64} height={64} className="w-full h-full object-cover" src={`${imgBasePharma}/${item.product_images[0]?.path}`} alt={item.name} onError={(e) => { (e.target as HTMLImageElement).src = asset("/images/placeholder.svg"); }} />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center"><Icon icon="mdi:image-off" className="w-6 h-6 text-gray-400" /></div>
                       )}
