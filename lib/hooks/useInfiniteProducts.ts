@@ -39,10 +39,13 @@ export const useAllProductsInfinite = (sortBy: string = 'asc', filters: ProductF
           ecom_final_selling_price:
             (p.ecom_final_selling_price as number) || (p.selling_price as number),
           ecom_discount_percentage: (p.ecom_discount_percentage as number) || null,
-          pack_quantity: 1,
-          ecom_pack_name: { name: ' Pcs' },
+          pack_quantity: (p.packsize_quantity as number) || 1,
+          ecom_pack_name: { name: (p.packsize_name as string) || 'Pcs' },
         },
         product_images: [],
+        packsize_quantity: p.packsize_quantity as number,
+        packsize_name: p.packsize_name as string,
+        stripe_qty: p.stripe_qty as number | string,
         stock_batches: p.stock ? [{ balanced_quantity: p.stock as number }] : [],
       }));
 

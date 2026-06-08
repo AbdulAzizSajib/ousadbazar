@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useSearchProducts } from "@/lib/hooks/useProducts";
 import { useSearchStore } from "@/stores/searchStore";
 import { imgBasePharma, asset } from "@/lib/config";
+import { getUnitInfo } from "@/lib/unitUtils";
 
 export default function SearchPage() {
   return (
@@ -70,47 +71,86 @@ function SearchContent() {
 
       {!isLoading && searchData.length > 0 && (
         <div className="flex flex-col gap-2 capitalize">
-          {searchData.map((item: any) => (
-            <Link
-              key={item.id}
-              href={`/product?id=${item?.id}`}
-              className="group flex w-full items-center gap-4 overflow-hidden rounded-xl border border-gray-100 bg-white p-3 transition-all duration-300 hover:border-gray-200 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800"
-            >
-              <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 md:h-28 md:w-28 dark:bg-gray-700">
-                <Image
-                  width={112}
-                  height={112}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  src={`${imgBasePharma}/${item?.path}`}
-                  alt={item?.name}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = asset("/images/placeholder.svg");
-                  }}
-                />
-              </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <h3
-                    className="line-clamp-1 text-[14px] font-semibold leading-snug text-gray-800 dark:text-gray-100"
-                    title={item?.name}
-                  >
-                    {item?.name}
-                  </h3>
-                  {item?.category_name && (
-                    <span className="rounded-full border border-gray-200 bg-[#F4F5F9] px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:border-gray-600/60 dark:bg-gray-800/80 dark:text-gray-300">
-                      {item.category_name}
-                    </span>
-                  )}
+          {searchData.map((item: any) => {
+            const unit = getUnitInfo(item);
+            const finalPrice = unit.unitPrice;
+            const sellingPrice = unit.unitSellingPrice;
+            const apiDiscountPct = Number(item?.ecom_discount_percentage ?? 0);
+            const hasDiscount =
+              unit.unitStock > 0 &&
+              (apiDiscountPct > 0 || sellingPrice > finalPrice);
+            const discountPct =
+              apiDiscountPct > 0
+                ? apiDiscountPct
+                : hasDiscount
+                ? Math.round(((sellingPrice - finalPrice) / sellingPrice) * 100)
+                : 0;
+            const unitLabel = unit.sellsByStrip
+              ? `${unit.piecesPerUnit} ${item?.category_name || unit.unitLabelPlural} (1 strip)`
+              : '';
+
+            return (
+              <Link
+                key={item.id}
+                href={`/product?id=${item?.id}`}
+                className="group flex w-full items-center gap-4 overflow-hidden rounded-xl border border-gray-100 bg-white p-3 transition-all duration-300 hover:border-gray-200 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800"
+              >
+                <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 md:h-28 md:w-28 dark:bg-gray-700">
+                  <Image
+                    width={112}
+                    height={112}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    src={`${imgBasePharma}/${item?.path}`}
+                    alt={item?.name}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = asset("/images/placeholder.svg");
+                    }}
+                  />
                 </div>
-                {item?.generic_name && (
-                  <p className="line-clamp-1 text-[12px] text-gray-500 normal-case dark:text-gray-400">
-                    {item.generic_name}
-                  </p>
-                )}
-              </div>
-            </Link>
-          ))}
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <h3
+                      className="line-clamp-1 text-[14px] font-semibold leading-snug text-gray-800 dark:text-gray-100"
+                      title={item?.name}
+                    >
+                      {item?.name}
+                    </h3>
+                    {item?.category_name && (
+                      <span className="rounded-full border border-gray-200 bg-[#F4F5F9] px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:border-gray-600/60 dark:bg-gray-800/80 dark:text-gray-300">
+                        {item.category_name}
+                      </span>
+                    )}
+                  </div>
+                  {item?.generic_name && (
+                    <p className="line-clamp-1 text-[12px] text-gray-500 normal-case dark:text-gray-400">
+                      {item.generic_name}
+                    </p>
+                  )}
+                  {unitLabel && (
+                    <p className="text-[12px] text-gray-500 normal-case dark:text-gray-400">
+                      {unitLabel}
+                    </p>
+                  )}
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-[15px] font-semibold tabular-nums text-gray-900 dark:text-gray-100">
+                      ৳{finalPrice.toFixed(2)}
+                    </span>
+                    {hasDiscount && (
+                      <>
+                        <span className="font-mono text-[13px] tabular-nums text-gray-500 line-through decoration-red-500 decoration-2">
+                          ৳{sellingPrice.toFixed(2)}
+                        </span>
+                        <span className="rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                          {discountPct}% off
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
 
