@@ -152,7 +152,7 @@ export default function Header({
             <Link className="flex items-center gap-1 sm:gap-2" href="/order-history">
               <Icon icon="tdesign:chat-bubble-history-filled" className="shrink-0" />
               <span className="hidden sm:inline">Order History</span>
-              <span className="sm:hidden">History</span>
+              <span className="sm:hidden">Order History</span>
             </Link>
             <div className="border-l border-slate-300 h-3" />
             <button
@@ -162,7 +162,7 @@ export default function Header({
             >
               <Icon icon="garden:upload-fill-16" className="shrink-0" />
               <span className="hidden sm:inline">Upload Prescription</span>
-              <span className="sm:hidden">Upload</span>
+              <span className="sm:hidden">Upload Prescription </span>
             </button>
           </div>
         </div>
@@ -302,6 +302,26 @@ export default function Header({
                   />
                 </button>
               </Badge>
+              {!isLoggedIn ? (
+                <button
+                  onClick={onShowLoginModal}
+                  aria-label="Login"
+                  className="p-2.5 rounded-xl hover:bg-[#388072]/10 transition-all duration-300 active:scale-95"
+                >
+                  <Icon
+                    icon="solar:user-circle-linear"
+                    className="w-6 h-6 text-gray-700 dark:text-gray-200"
+                  />
+                </button>
+              ) : (
+                <button
+                  onClick={onLogout}
+                  aria-label="Logout"
+                  className="p-2.5 rounded-xl hover:bg-red-50 transition-all duration-300 active:scale-95"
+                >
+                  <Icon icon="solar:logout-2-outline" className="w-6 h-6 text-red-600" />
+                </button>
+              )}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="p-2.5 rounded-xl hover:bg-[#388072]/10 transition-all duration-300 active:scale-95"
@@ -333,6 +353,23 @@ export default function Header({
               >
                 <Icon icon="solar:bag-check-outline" className="w-5 h-5" /> My Orders
               </Link>
+              <Link
+                href="/order-history"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 dark:text-gray-200 hover:text-[#388072] hover:bg-[#388072]/10 transition-all duration-200"
+              >
+                <Icon icon="tdesign:chat-bubble-history-filled" className="w-5 h-5" /> Order History
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  handleOpenPrescription();
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-gray-700 dark:text-gray-200 hover:text-[#388072] hover:bg-[#388072]/10 transition-all duration-200"
+              >
+                <Icon icon="garden:upload-fill-16" className="w-5 h-5" /> Upload Prescription
+              </button>
               <div className="pt-3 px-1">
                 {!isLoggedIn ? (
                   <button
@@ -453,7 +490,7 @@ export default function Header({
                       {column.items.map((item) => (
                         <li key={item.id}>
                           <Link
-                            href={`/search?q=${encodeURIComponent(item.name)}`}
+                            href={`/best-selling?category_id=${item.id}`}
                             onClick={() => setOpenDropdown(null)}
                             className="text-sm text-gray-700 hover:text-[#012068] hover:translate-x-1 inline-block transition-all duration-200"
                           >

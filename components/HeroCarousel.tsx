@@ -6,14 +6,15 @@ import Link from 'next/link';
 export type CarouselSlide = {
   id: number | string;
   image: string;
+  mobileImage?: string;
   alt?: string;
   href?: string;
 };
 
 const defaultSlides: CarouselSlide[] = [
-  { id: 4, image: '/carousel/Banner-123.png', alt: 'Banner 4' },
-  { id: 5, image: '/carousel/Banner-5.webp', alt: 'Banner 5' },
-  { id: 6, image: '/carousel/Banner-6.webp', alt: 'Banner 6' },
+  { id: 4, image: '/carousel/Banner-123.png', mobileImage: '/mobileCarousel/banner-1.webp', alt: 'Banner 4' },
+  { id: 5, image: '/carousel/Banner-5.webp', mobileImage: '/mobileCarousel/banner-2.webp', alt: 'Banner 5' },
+  { id: 6, image: '/carousel/Banner-6.webp', mobileImage: '/mobileCarousel/banner-3.webp', alt: 'Banner 6' },
 ];
 
 interface HeroCarouselProps {
@@ -39,24 +40,29 @@ export default function HeroCarousel({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 ">
       {/* LEFT: Carousel */}
-      <div className="relative overflow-hidden rounded-xl">
+      <div className="relative overflow-hidden md:rounded-xl">
         <div
           className="flex transition-transform duration-700 ease-in-out h-full"
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
           {slides.map((slide, i) => {
             const img = (
-              <img
-                src={slide.image}
-                alt={slide.alt || `Slide ${slide.id}`}
-                loading={i === 0 ? 'eager' : 'lazy'}
-                className="block w-full h-full object-cover object-center"
-              />
+              <picture>
+                {slide.mobileImage && (
+                  <source media="(max-width: 767px)" srcSet={slide.mobileImage} />
+                )}
+                <img
+                  src={slide.image}
+                  alt={slide.alt || `Slide ${slide.id}`}
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  className="block w-full h-full object-cover object-center"
+                />
+              </picture>
             );
             return (
               <div
                 key={slide.id}
-                className="min-w-full aspect-[16/7] sm:aspect-[16/6] md:aspect-[32/9] lg:aspect-[32/8] xl:aspect-[32/7]"
+                className="min-w-full aspect-[16/9] sm:aspect-[16/6] md:aspect-[32/9] lg:aspect-[32/8] xl:aspect-[32/7]"
               >
                 {slide.href ? <Link href={slide.href} className="block w-full h-full">{img}</Link> : img}
               </div>
