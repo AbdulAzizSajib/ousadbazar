@@ -81,10 +81,10 @@ export default function ProductCard({ item }: ProductCardProps) {
             height={220}
             loading="lazy"
             className="h-full w-full transition-transform duration-300 group-hover:scale-105"
-            src={`${imgBasePharma}/${item?.path}`}
+            src={item?.path ? `${imgBasePharma}/${item.path}` : asset('/images/default.png')}
             alt={item?.name}
             onError={(e) => {
-              (e.target as HTMLImageElement).src = asset('/images/placeholder.svg');
+              (e.target as HTMLImageElement).src = asset('/images/default.png');
             }}
           />
           <span className="absolute left-2 top-2 rounded-full border border-gray-200 bg-[#F4F5F9] px-2.5 py-0.5 text-[10px] font-medium text-gray-600 backdrop-blur-sm dark:border-gray-600/60 dark:bg-gray-800/80 dark:text-gray-300">

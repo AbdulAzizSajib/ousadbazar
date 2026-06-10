@@ -176,7 +176,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
         image: [
           productDetail?.path
             ? `${imgBasePharma}/${productDetail.path}`
-            : "https://ousadbazar.com/ousadbazar/images/default.jpg",
+            : asset("/images/default.png"),
         ],
         description: `Order ${productName} ${productSize} online in Bangladesh from OusadBazar at the best price. Enjoy fast delivery, 100% genuine products & easy online ordering.`,
         sku: String(productDetail?.sku || productDetail?.id || ""),
@@ -226,7 +226,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
   const stock = unit.unitStock;
   const imageSrc = productDetail?.path
     ? `${imgBasePharma}/${productDetail.path}`
-    : asset("/images/default.jpg");
+    : asset("/images/default.png");
 
   const sellingPrice = finalPrice;
 
@@ -281,7 +281,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                   src={imageSrc}
                   alt={productName}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = asset("/images/default.jpg");
+                    (e.target as HTMLImageElement).src = asset("/images/default.png");
                   }}
                 />
               </div>
@@ -345,8 +345,8 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                   {hasDiscount && (
                     <>
                       <span className="text-lg text-gray-400 line-through">৳{perUnitSellingPrice.toFixed(2)}</span>
-                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-red-500 to-rose-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-md shadow-sm">
-                        <Icon icon="mdi:trending-down" className="w-3.5 h-3.5" />
+                      <span className="inline-flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-md shadow-sm">
+                        <Icon icon="mdi:tag" className="w-3.5 h-3.5" />
                         Save {discountPct}%
                       </span>
                     </>

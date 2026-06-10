@@ -9,6 +9,7 @@ import { useCartStore } from '@/stores/cartStore';
 import { useSearchStore } from '@/stores/searchStore';
 import { formatNumber, asset } from '@/lib/config';
 import { useCategories } from '@/lib/hooks/useCategories';
+import UploadPrescriptionModal from './UploadPrescriptionModal';
 
 type NavItem = { id: string | number; name: string };
 type NavColumn = { title: string; items: NavItem[] };
@@ -32,6 +33,7 @@ export default function Header({
   const [showTopBar, setShowTopBar] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const cartProduct = useCartStore((s) => s.cartProduct);
   const totalPrice = useCartStore((s) => s.totalPrice);
@@ -131,23 +133,27 @@ export default function Header({
       <div className="bg-primary font-light h-[30px] flex items-center">
         <div className="flex items-center justify-center sm:justify-end px-2 container mx-auto text-white">
           <div className="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-[13px]">
-            <Link className="flex items-center gap-1 sm:gap-2" href="/order-tracking">
+            {/* <Link className="flex items-center gap-1 sm:gap-2" href="/order-tracking">
               <Icon icon="subway:location" className="shrink-0" />
               <span className="hidden sm:inline">Track Order</span>
               <span className="sm:hidden">Track</span>
-            </Link>
-            <div className="border-l border-slate-300 h-3" />
+            </Link> */}
+            {/* <div className="border-l border-slate-300 h-3" /> */}
             <Link className="flex items-center gap-1 sm:gap-2" href="/order-history">
               <Icon icon="tdesign:chat-bubble-history-filled" className="shrink-0" />
               <span className="hidden sm:inline">Order History</span>
               <span className="sm:hidden">History</span>
             </Link>
             <div className="border-l border-slate-300 h-3" />
-            <Link className="flex items-center gap-1 sm:gap-2" href="/">
+            <button
+              type="button"
+              onClick={() => setShowPrescriptionModal(true)}
+              className="flex items-center gap-1 sm:gap-2 hover:opacity-80 transition-opacity"
+            >
               <Icon icon="garden:upload-fill-16" className="shrink-0" />
               <span className="hidden sm:inline">Upload Prescription</span>
               <span className="sm:hidden">Upload</span>
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -221,7 +227,7 @@ export default function Header({
               <div className="flex items-center space-x-3">
                 <span className="border p-2 rounded-lg flex items-center gap-2 font-semibold">
                   <Icon className="size-5 text-[#012068]" icon="material-symbols:call" />
-                  <h2>01915606090</h2>
+                  <h2>01755534991</h2>
                 </span>
 
                 <Badge
@@ -453,6 +459,11 @@ export default function Header({
           </div>
         )}
       </div>
+
+      <UploadPrescriptionModal
+        open={showPrescriptionModal}
+        onClose={() => setShowPrescriptionModal(false)}
+      />
     </div>
   );
 }

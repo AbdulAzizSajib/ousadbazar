@@ -115,6 +115,11 @@ export default function CheckoutPage() {
             <div className="space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Your Name <span className="text-red-500">*</span></label>
                 <input type="text" className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition" placeholder="আপনার নাম" value={address.full_name} onChange={(e) => setAddress((p) => ({ ...p, full_name: e.target.value }))} /></div>
+                {/* your area */}
+              <div><label className="block text-sm font-medium text-gray-700 mb-1">Your Area <span className="text-red-500">*</span></label>
+                <select className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition" value={address.area_id} onChange={(e) => setAddress((p) => ({ ...p, area_id: Number(e.target.value) }))}>
+                  <option value={1}>Aftabnagar</option>
+                </select></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Your Full Address <span className="text-red-500">*</span></label>
                 <input type="text" className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition" placeholder="আপনার পূর্ণ ঠিকানা" value={address.address} onChange={(e) => setAddress((p) => ({ ...p, address: e.target.value }))} readOnly={!!storedUser} /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Your Phone Number <span className="text-red-500">*</span></label>
@@ -134,7 +139,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="w-16 h-16 flex-shrink-0 bg-gray-50 rounded border border-gray-200 overflow-hidden">
                       {item?.product_images && item.product_images.length > 0 ? (
-                        <img width={64} height={64} className="w-full h-full object-cover" src={`${imgBasePharma}/${item.product_images[0]?.path}`} alt={item.name} onError={(e) => { (e.target as HTMLImageElement).src = asset("/images/placeholder.svg"); }} />
+                        <img width={64} height={64} className="w-full h-full object-cover" src={`${imgBasePharma}/${item.product_images[0]?.path}`} alt={item.name} onError={(e) => { (e.target as HTMLImageElement).src = asset("/images/default.png"); }} />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center"><Icon icon="mdi:image-off" className="w-6 h-6 text-gray-400" /></div>
                       )}

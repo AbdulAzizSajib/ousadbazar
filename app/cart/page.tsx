@@ -66,9 +66,9 @@ export default function CartPage() {
                         <div className="flex-shrink-0">
                           <div className="w-20 h-20 bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
                             {product?.product_images && product.product_images.length > 0 ? (
-                              <img width={80} height={80} className="w-full h-full object-cover" src={`${imgBasePharma}/${product.product_images[0]?.path}`} alt={product.name} onError={(e) => { (e.target as HTMLImageElement).src = asset("/images/placeholder.svg"); }} />
+                              <img width={80} height={80} className="w-full h-full object-cover" src={`${imgBasePharma}/${product.product_images[0]?.path}`} alt={product.name} onError={(e) => { (e.target as HTMLImageElement).src = asset("/images/default.png"); }} />
                             ) : product?.path ? (
-                              <img width={80} height={80} className="w-full h-full object-cover" src={`${imgBasePharma}/${product.path}`} alt={product.name} onError={(e) => { (e.target as HTMLImageElement).src = asset("/images/placeholder.svg"); }} />
+                              <img width={80} height={80} className="w-full h-full object-cover" src={`${imgBasePharma}/${product.path}`} alt={product.name} onError={(e) => { (e.target as HTMLImageElement).src = asset("/images/default.png"); }} />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center"><Icon icon="mdi:image-off" className="w-8 h-8 text-gray-400" /></div>
                             )}

@@ -8,7 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSearchProducts } from "@/lib/hooks/useProducts";
 import { useSearchStore } from "@/stores/searchStore";
-import { imgBasePharma, asset } from "@/lib/config";
+import { imgBasePharma, asset, formatNumber } from "@/lib/config";
 import { getUnitInfo } from "@/lib/unitUtils";
 
 export default function SearchPage() {
@@ -70,82 +70,92 @@ function SearchContent() {
       )}
 
       {!isLoading && searchData.length > 0 && (
-        <div className="flex flex-col gap-2 capitalize">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {searchData.map((item: any) => {
             const unit = getUnitInfo(item);
+            const stock = unit.unitStock;
             const finalPrice = unit.unitPrice;
             const sellingPrice = unit.unitSellingPrice;
             const apiDiscountPct = Number(item?.ecom_discount_percentage ?? 0);
             const hasDiscount =
-              unit.unitStock > 0 &&
-              (apiDiscountPct > 0 || sellingPrice > finalPrice);
+              apiDiscountPct > 0 || sellingPrice > finalPrice;
             const discountPct =
               apiDiscountPct > 0
                 ? apiDiscountPct
                 : hasDiscount
                 ? Math.round(((sellingPrice - finalPrice) / sellingPrice) * 100)
                 : 0;
-            const unitLabel = unit.sellsByStrip
-              ? `${unit.piecesPerUnit} ${item?.category_name || unit.unitLabelPlural} (1 strip)`
-              : '';
+            const categoryName = item?.category?.name || item?.category_name || '';
+            const stripLabel = item?.category_name || unit.unitLabelPlural;
 
             return (
               <Link
                 key={item.id}
                 href={`/product?id=${item?.id}`}
-                className="group flex w-full items-center gap-4 overflow-hidden rounded-xl border border-gray-100 bg-white p-3 transition-all duration-300 hover:border-gray-200 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800"
+                className="group relative flex h-full w-full max-w-[230px] flex-col overflow-hidden rounded-xl border border-gray-100 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600"
               >
-                <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 md:h-28 md:w-28 dark:bg-gray-700">
+                <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-gray-700">
                   <Image
-                    width={112}
-                    height={112}
+                    width={220}
+                    height={220}
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    src={`${imgBasePharma}/${item?.path}`}
+                    className="h-full w-full transition-transform duration-300 group-hover:scale-105"
+                    src={item?.path ? `${imgBasePharma}/${item.path}` : asset("/images/default.png")}
                     alt={item?.name}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = asset("/images/placeholder.svg");
+                      (e.target as HTMLImageElement).src = asset("/images/default.png");
                     }}
                   />
-                </div>
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3
-                      className="line-clamp-1 text-[14px] font-semibold leading-snug text-gray-800 dark:text-gray-100"
-                      title={item?.name}
-                    >
-                      {item?.name}
-                    </h3>
-                    {item?.category_name && (
-                      <span className="rounded-full border border-gray-200 bg-[#F4F5F9] px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:border-gray-600/60 dark:bg-gray-800/80 dark:text-gray-300">
-                        {item.category_name}
-                      </span>
-                    )}
-                  </div>
-                  {item?.generic_name && (
-                    <p className="line-clamp-1 text-[12px] text-gray-500 normal-case dark:text-gray-400">
-                      {item.generic_name}
-                    </p>
-                  )}
-                  {unitLabel && (
-                    <p className="text-[12px] text-gray-500 normal-case dark:text-gray-400">
-                      {unitLabel}
-                    </p>
-                  )}
-                  <div className="mt-1 flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-[15px] font-semibold tabular-nums text-gray-900 dark:text-gray-100">
-                      ৳{finalPrice.toFixed(2)}
+                  {categoryName && (
+                    <span className="absolute left-2 top-2 rounded-full border border-gray-200 bg-[#F4F5F9] px-2.5 py-0.5 text-[10px] font-medium text-gray-600 backdrop-blur-sm dark:border-gray-600/60 dark:bg-gray-800/80 dark:text-gray-300">
+                      {categoryName}
                     </span>
-                    {hasDiscount && (
-                      <>
-                        <span className="font-mono text-[13px] tabular-nums text-gray-500 line-through decoration-red-500 decoration-2">
+                  )}
+                  {hasDiscount && (
+                    <span className="absolute right-2 top-2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                      {discountPct}% off
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-1 flex-col gap-2 px-3 pb-3 pt-2.5 border">
+                  <h3
+                    className="line-clamp-2 min-h-[36px] text-[13px] font-medium leading-snug text-gray-800 dark:text-gray-100"
+                    title={item?.name}
+                  >
+                    {item?.name}
+                  </h3>
+
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    <span
+                      className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${stock > 0 ? 'bg-emerald-500' : 'bg-red-500'}`}
+                    />
+                    <span
+                      className={`text-[11px] ${stock > 0 ? 'text-gray-400 dark:text-gray-500' : 'text-red-500 dark:text-red-400'}`}
+                    >
+                      {stock > 0
+                        ? `In stock (${formatNumber(stock)} ${unit.unitLabelPlural})`
+                        : 'Out of stock'}
+                    </span>
+                  </div>
+
+                  {unit.sellsByStrip && (
+                    <div className="mt-0.5 text-sm">
+                      {unit.piecesPerUnit} {stripLabel} (1 strip)
+                    </div>
+                  )}
+
+                  <div className="mt-2 flex items-center justify-between gap-1.5">
+                    <span>
+                      {hasDiscount && (
+                        <span className="font-mono text-[15px] tabular-nums text-gray-600 line-through decoration-red-500 decoration-2">
                           ৳{sellingPrice.toFixed(2)}
                         </span>
-                        <span className="rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-semibold text-white">
-                          {discountPct}% off
-                        </span>
-                      </>
-                    )}
+                      )}
+                    </span>
+                    <span className="font-mono text-[15px] font-semibold tabular-nums tracking-tight text-gray-900 dark:text-gray-100">
+                      ৳ {finalPrice.toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </Link>
