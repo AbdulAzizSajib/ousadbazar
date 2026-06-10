@@ -18,7 +18,7 @@ export const useAllProductsInfinite = (sortBy: string = 'asc', filters: ProductF
     queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         page: String(pageParam),
-        paginate: '20',
+        limit: '12',
         sort_by: sortBy,
       });
       if (categoryId != null) params.set('category_id', String(categoryId));

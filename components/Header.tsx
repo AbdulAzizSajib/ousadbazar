@@ -9,6 +9,7 @@ import { useCartStore } from '@/stores/cartStore';
 import { useSearchStore } from '@/stores/searchStore';
 import { formatNumber, asset } from '@/lib/config';
 import { useCategories } from '@/lib/hooks/useCategories';
+import { showNotification } from '@/lib/notification';
 import UploadPrescriptionModal from './UploadPrescriptionModal';
 
 type NavItem = { id: string | number; name: string };
@@ -34,6 +35,15 @@ export default function Header({
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+
+  const handleOpenPrescription = () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      showNotification('warning', 'Please login to upload a prescription');
+      return;
+    }
+    setShowPrescriptionModal(true);
+  };
   const dropdownRef = useRef<HTMLDivElement>(null);
   const cartProduct = useCartStore((s) => s.cartProduct);
   const totalPrice = useCartStore((s) => s.totalPrice);
@@ -147,7 +157,7 @@ export default function Header({
             <div className="border-l border-slate-300 h-3" />
             <button
               type="button"
-              onClick={() => setShowPrescriptionModal(true)}
+              onClick={handleOpenPrescription}
               className="flex items-center gap-1 sm:gap-2 hover:opacity-80 transition-opacity"
             >
               <Icon icon="garden:upload-fill-16" className="shrink-0" />

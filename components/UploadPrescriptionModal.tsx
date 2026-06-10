@@ -136,7 +136,7 @@ export default function UploadPrescriptionModal({ open, onClose }: UploadPrescri
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          <div>
+          <div className="hidden">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Mobile Number
             </label>
