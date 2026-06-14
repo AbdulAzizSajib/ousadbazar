@@ -5,6 +5,7 @@ import { Modal } from "antd";
 import { Icon } from "@iconify/react";
 import { useSendOtp, useVerifyOtp } from "@/lib/hooks/useAuth";
 import { showNotification } from "@/lib/notification";
+import { setCookie } from "@/lib/cookies";
 
 interface LoginModalProps {
   open: boolean;
@@ -101,8 +102,8 @@ export default function LoginModal({ open, onClose, onLoginSuccess }: LoginModal
       {
         onSuccess: (data) => {
           if (data?.status === "success") {
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("mobile", data.mobile);
+            setCookie("token", data.token);
+            setCookie("mobile", data.mobile);
             showNotification("success", data.message);
             onLoginSuccess(data.token);
             handleCancel();

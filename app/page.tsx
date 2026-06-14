@@ -133,7 +133,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <CategoryCarousel />
+      {/* <CategoryCarousel /> */}
 
       <div className="flex items-end justify-between gap-3 mt-10 md:mt-16 mb-5 md:mb-7">
         <div className="flex items-center gap-3">

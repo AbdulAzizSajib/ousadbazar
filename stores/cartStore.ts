@@ -39,7 +39,9 @@ export const useCartStore = create<CartState>()(
       },
 
       getCart: (product: Product, quantity: number, singleQty: number) => {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const token = typeof window !== 'undefined'
+          ? (document.cookie.split("; ").find((r) => r.startsWith("token="))?.split("=")[1] ?? null)
+          : null;
         if (!token) {
           showNotification('warning', 'Please login first to add items to cart');
           return false;

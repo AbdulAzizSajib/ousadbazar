@@ -8,6 +8,7 @@ import { Badge } from 'antd';
 import { useCartStore } from '@/stores/cartStore';
 import { useSearchStore } from '@/stores/searchStore';
 import { formatNumber, asset } from '@/lib/config';
+import { getCookie } from '@/lib/cookies';
 import { useCategories } from '@/lib/hooks/useCategories';
 import { showNotification } from '@/lib/notification';
 import UploadPrescriptionModal from './UploadPrescriptionModal';
@@ -37,7 +38,7 @@ export default function Header({
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
 
   const handleOpenPrescription = () => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = getCookie('token');
     if (!token) {
       showNotification('warning', 'Please login to upload a prescription');
       return;
@@ -237,7 +238,7 @@ export default function Header({
               <div className="flex items-center space-x-3">
                 <span className="border p-2 rounded-lg flex items-center gap-2 font-semibold">
                   <Icon className="size-5 text-[#012068]" icon="material-symbols:call" />
-                  <h2>01755534991</h2>
+                  <h2>01888303266</h2>
                 </span>
 
                 <Badge

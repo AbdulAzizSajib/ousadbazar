@@ -17,10 +17,12 @@ const toSlug = (text: string) =>
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   try {
     const res = await fetch(`${apiBasePharma}/all-category`, { cache: 'no-store' });
-    if (!res.ok) return [];
+    if (!res.ok) return [{ slug: '_' }];
     const json = await res.json();
     const list: ApiCategory[] = Array.isArray(json?.categories)
       ? json.categories
@@ -36,12 +38,12 @@ export async function generateStaticParams() {
       }
     }
 
-    return Array.from(seen.values()).map(({ id, name }) => ({
+    const params = Array.from(seen.values()).map(({ id, name }) => ({
       slug: `${toSlug(name)}-${id}`,
     }));
-  } catch (error) {
-    console.error('generateStaticParams (best-selling/[slug]) failed:', error);
-    return [];
+    return params.length > 0 ? params : [{ slug: '_' }];
+  } catch {
+    return [{ slug: '_' }];
   }
 }
 

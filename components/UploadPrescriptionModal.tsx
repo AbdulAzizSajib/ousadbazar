@@ -27,7 +27,8 @@ export default function UploadPrescriptionModal({ open, onClose }: UploadPrescri
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("mobile");
+      const match = document.cookie.split("; ").find((r) => r.startsWith("mobile="));
+      const saved = match ? decodeURIComponent(match.split("=")[1]) : null;
       if (saved) setMobile(saved.replace(/^88/, ""));
     }
   }, [open]);
