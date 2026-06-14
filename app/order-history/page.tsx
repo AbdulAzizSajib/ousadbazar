@@ -6,14 +6,16 @@ import { Icon } from "@iconify/react";
 import { useOrderHistory } from "@/lib/hooks/useOrders";
 
 export default function OrderHistoryPage() {
-  const getMobileCookie = () => {
-    if (typeof document === "undefined") return "";
-    const match = document.cookie.split("; ").find((r) => r.startsWith("mobile="));
-    return match ? decodeURIComponent(match.split("=")[1]).replace(/^88/, "") : "";
-  };
-
-  const [phone, setPhone] = useState(() => getMobileCookie());
-  const [submittedPhone, setSubmittedPhone] = useState(() => getMobileCookie());
+  const [phone, setPhone] = useState(() =>
+    typeof window !== "undefined"
+      ? localStorage.getItem("mobile")?.replace(/^88/, "") || ""
+      : ""
+  );
+  const [submittedPhone, setSubmittedPhone] = useState(() =>
+    typeof window !== "undefined"
+      ? localStorage.getItem("mobile")?.replace(/^88/, "") || ""
+      : ""
+  );
   const [expanded, setExpanded] = useState<Record<string | number, boolean>>({});
 
   const {

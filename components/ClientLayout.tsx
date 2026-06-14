@@ -9,7 +9,6 @@ import CartDrawer from '@/components/CartDrawer';
 import LoginModal from '@/components/LoginModal';
 import { showNotification } from '@/lib/notification';
 import { useCartStore } from '@/stores/cartStore';
-import { getCookie, clearAuthCookies } from '@/lib/cookies';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -19,11 +18,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const resetCart = useCartStore((state) => state.resetCart);
 
   useEffect(() => {
-    setIsLoggedIn(!!getCookie('token'));
+    setIsLoggedIn(!!localStorage.getItem('token'));
   }, []);
 
   const handleLogout = () => {
-    clearAuthCookies();
+    localStorage.clear();
     resetCart();
     setIsLoggedIn(false);
     showNotification('success', 'Logged Out!');

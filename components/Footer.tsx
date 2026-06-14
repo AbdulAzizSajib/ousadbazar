@@ -42,7 +42,7 @@ export default function Footer() {
                 <Icon icon="mdi:youtube" className="w-5 h-5" />
               </a>
               <a
-                href="https://wa.me/8801888303266"
+                href="https://wa.me/8801755534991"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition"
@@ -124,7 +124,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Icon icon="solar:phone-linear" className="w-5 h-5 text-gray-300 shrink-0" />
-                <a href="tel:+8801888303266" className="text-gray-300 hover:text-white">
+                <a href="tel:+8801755534991" className="text-gray-300 hover:text-white">
                   +880 1915-606090
                 </a>
               </li>

@@ -1,4 +1,4 @@
-export const apiBasePharma = "https://ec.mis.digital/api1";
+export const apiBasePharma = "https://ec.mis.digital/api";
 
 // basePath prefix for static assets in public/ folder.
 // Plain <img> and <link> tags don't get auto-prefixed by Next.js, only next/image does.
@@ -18,7 +18,6 @@ export function formatNumber(number: number): string {
 
 export const getTokenConfig = () => {
   if (typeof window === "undefined") return { headers: {} };
-  const match = document.cookie.split("; ").find((r) => r.startsWith("token="));
-  const token = match ? decodeURIComponent(match.split("=")[1]) : "";
+  const token = localStorage.getItem("token") || "";
   return { headers: { Authorization: `Bearer ${token}` } };
 };

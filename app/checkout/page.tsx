@@ -8,17 +8,15 @@ import { imgBasePharma, asset } from "@/lib/config";
 import { useCartStore } from "@/stores/cartStore";
 import { useBillingAddressByPhone, useCreateOrder } from "@/lib/hooks/useOrders";
 import { showNotification } from "@/lib/notification";
+import type { User } from "@/types";
+
 export default function CheckoutPage() {
   const router = useRouter();
   const cartProduct = useCartStore((s) => s.cartProduct);
   const totalPrice = useCartStore((s) => s.totalPrice);
   const resetCart = useCartStore((s) => s.resetCart);
 
-  const getMobileCookie = () => {
-    if (typeof document === "undefined") return "";
-    const match = document.cookie.split("; ").find((r) => r.startsWith("mobile="));
-    return match ? decodeURIComponent(match.split("=")[1]).replace(/^88/, "") : "";
-  };
+  const storedUser: User | null = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null;
 
   const { mutate: createOrder, isPending: isOrderLoading } = useCreateOrder();
   const [shippingCost] = useState(0);
@@ -26,8 +24,8 @@ export default function CheckoutPage() {
   const [saleCode, setSaleCode] = useState("");
 
   const [address, setAddress] = useState({
-    full_name: "",
-    mobile: getMobileCookie(),
+    full_name: storedUser?.name || "",
+    mobile: (typeof window !== "undefined" ? localStorage.getItem("mobile")?.replace(/^88/, "") : "") || storedUser?.phone || "",
     address: "",
     country_id: 1, city_id: 1, area_id: 1, note: "",
   });
@@ -90,7 +88,7 @@ export default function CheckoutPage() {
       phone: `88${address.mobile}`,
       shipping_cost: Number(shippingCost || 0),
       billing_address: address,
-      user: { id: 1 },
+      user: storedUser ? { id: storedUser.id } : { id: 1 },
       payment_method_id: paymentMethodId,
     };
 
@@ -123,7 +121,7 @@ export default function CheckoutPage() {
                   <option value={1}>Aftabnagar</option>
                 </select></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Your Full Address <span className="text-red-500">*</span></label>
-                <input type="text" className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition" placeholder="আপনার পূর্ণ ঠিকানা" value={address.address} onChange={(e) => setAddress((p) => ({ ...p, address: e.target.value }))} readOnly={false} /></div>
+                <input type="text" className="w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition" placeholder="আপনার পূর্ণ ঠিকানা" value={address.address} onChange={(e) => setAddress((p) => ({ ...p, address: e.target.value }))} readOnly={!!storedUser} /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Your Phone Number <span className="text-red-500">*</span></label>
                 <input type="tel" className={`w-full bg-white text-gray-900 border border-gray-300 rounded px-4 py-3 text-sm focus:ring-2 focus:ring-[#012068] outline-none transition ${!isValidMobile && address.mobile ? "border-red-400" : ""}`} placeholder="আপনার মোবাইল নম্বর" value={address.mobile} onChange={(e) => onlyNumber(e.target.value)} />
                 {!isValidMobile && address.mobile && <p className="text-red-500 text-xs mt-1">{validationError}</p>}</div>
