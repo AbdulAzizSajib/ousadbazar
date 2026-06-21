@@ -143,6 +143,8 @@ export default function CartDrawer({ visible, onClose }: CartDrawerProps) {
                 const qty = product.quantity || 1;
                 const perUnitPrice = unit.unitPrice;
                 const totalItemPrice = perUnitPrice * qty;
+                const totalOriginalPrice = unit.unitSellingPrice * qty;
+                const hasDiscount = totalOriginalPrice > totalItemPrice;
                 const isLowStock = stock > 0 && stock <= 5;
                 const stripLabel = product?.category_name || unit.unitLabelPlural;
                 const selectedPieces = qty * unit.piecesPerUnit;
@@ -265,6 +267,11 @@ export default function CartDrawer({ visible, onClose }: CartDrawerProps) {
 
                           {/* Total price */}
                           <div className="text-right">
+                            {hasDiscount && (
+                              <div className="text-[11px] text-gray-400 line-through tabular-nums">
+                                ৳{totalOriginalPrice.toFixed(2)}
+                              </div>
+                            )}
                             <span className="text-[15px] font-bold text-[#012068] tabular-nums">
                               ৳{totalItemPrice.toFixed(2)}
                             </span>
@@ -280,20 +287,35 @@ export default function CartDrawer({ visible, onClose }: CartDrawerProps) {
 
           {/* Footer */}
           <div className="border-t border-gray-100 bg-white px-5 pt-4 pb-4 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.05)]">
-            <div className="mb-3 space-y-1.5">
-              <div className="flex justify-between items-center text-[13px] text-gray-500">
-                <span>Subtotal ({cartProduct.length} items)</span>
-                <span className="font-medium text-gray-700 tabular-nums">
-                  ৳{formatNumber(totalPrice || 0)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center pt-2 border-t border-dashed border-gray-200">
-                <span className="text-gray-900 font-semibold">Total</span>
-                <span className="text-xl font-bold text-[#012068] tabular-nums">
-                  ৳{formatNumber(totalPrice || 0)}
-                </span>
-              </div>
-            </div>
+            {(() => {
+              const mrpTotal = cartProduct.reduce((sum, p) => sum + (p?.total_previous_price || p?.total_price || 0), 0);
+              const discountTotal = mrpTotal - (totalPrice || 0);
+              const hasAnyDiscount = discountTotal > 0.01;
+              return (
+                <div className="mb-3 space-y-1.5">
+                  <div className="flex justify-between items-center text-[13px] text-gray-500">
+                    <span>Subtotal (MRP)</span>
+                    <span className="font-medium text-gray-700 tabular-nums">
+                      ৳{formatNumber(mrpTotal)}
+                    </span>
+                  </div>
+                  {hasAnyDiscount && (
+                    <div className="flex justify-between items-center text-[13px]">
+                      <span className="text-red-500 font-medium">Discount applied</span>
+                      <span className="font-medium text-red-500 tabular-nums">
+                        -৳{formatNumber(discountTotal)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center pt-2 border-t border-dashed border-gray-200">
+                    <span className="text-gray-900 font-semibold">Total</span>
+                    <span className="text-xl font-bold text-[#012068] tabular-nums">
+                      ৳{formatNumber(totalPrice || 0)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
             <div className="space-y-2">
               <button
                 onClick={checkoutHandler}

@@ -146,11 +146,28 @@ export default function CheckoutPage() {
                     </div>
                     <div className="min-w-0"><p className="text-sm text-gray-800 truncate">{item?.name}</p><p className="text-xs text-gray-500 mt-0.5">× {item?.singleQty || 1}</p></div>
                   </div>
-                  <span className="text-sm font-medium text-gray-900 whitespace-nowrap">৳ {Number(item?.total_price || 0).toFixed(2)}</span>
+                  <div className="text-right whitespace-nowrap">
+                    {(item?.total_previous_price || 0) > (item?.total_price || 0) && (
+                      <p className="text-xs text-gray-400 line-through">৳ {Number(item?.total_previous_price || 0).toFixed(2)}</p>
+                    )}
+                    <span className="text-sm font-medium text-gray-900">৳ {Number(item?.total_price || 0).toFixed(2)}</span>
+                  </div>
                 </div>
               ))}
-              <div className="flex justify-between items-center px-4 py-3 border-b border-dashed border-gray-300"><span className="text-sm text-[#012068] font-medium">Subtotal</span><span className="text-sm font-semibold text-gray-900">৳ {Number(totalPrice || 0).toFixed(2)}</span></div>
-              <div className="flex justify-between items-center px-4 py-3 bg-gray-50"><span className="text-base font-bold text-gray-900">Total</span><span className="text-lg font-bold text-[#012068]">৳ {Number((Number(totalPrice) || 0) + (Number(shippingCost) || 0)).toFixed(2)}</span></div>
+              {(() => {
+                const mrpTotal = cartProduct.reduce((sum, p) => sum + (p?.total_previous_price || p?.total_price || 0), 0);
+                const discountTotal = mrpTotal - (totalPrice || 0);
+                const hasAnyDiscount = discountTotal > 0.01;
+                return (
+                  <>
+                    <div className="flex justify-between items-center px-4 py-3 border-b border-dashed border-gray-300"><span className="text-sm text-[#012068] font-medium">Subtotal (MRP)</span><span className="text-sm font-semibold text-gray-900">৳ {mrpTotal.toFixed(2)}</span></div>
+                    {hasAnyDiscount && (
+                      <div className="flex justify-between items-center px-4 py-3 border-b border-dashed border-gray-300"><span className="text-sm text-red-500 font-medium">Discount applied</span><span className="text-sm font-semibold text-red-500">-৳ {discountTotal.toFixed(2)}</span></div>
+                    )}
+                    <div className="flex justify-between items-center px-4 py-3 bg-gray-50"><span className="text-base font-bold text-gray-900">Total</span><span className="text-lg font-bold text-[#012068]">৳ {Number((Number(totalPrice) || 0) + (Number(shippingCost) || 0)).toFixed(2)}</span></div>
+                  </>
+                );
+              })()}
             </div>
           </section>
 
