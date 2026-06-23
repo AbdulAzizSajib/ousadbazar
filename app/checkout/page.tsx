@@ -76,12 +76,16 @@ export default function CheckoutPage() {
 
     const payload = {
       sale_products: cartProduct.map((item) => ({
-        product_id: item.id || "", product_name: item.name || "",
+        product_id: item.id || "",
+        product_name: item.name || "",
         price: Number(item?.product_prices?.ecom_final_selling_price || item?.price || 0),
+        discount_amount: Number((item?.total_previous_price || 0) - (item?.total_price || 0)),
         quantity: item.singleQty || 1,
         pack_size_id: item?.product_prices?.pack_size_id || item?.pack_size?.id || "",
         pack_size_quantity: Number(item?.product_prices?.pack_quantity || item?.pack_size?.quantity || 1),
-        total_quantity: Number(item?.quantity || 0), total: Number(item?.total_price || 0),
+        total_quantity: Number(item?.quantity || 0),
+        // + (item?.total_price || 0)
+        total: Number((item?.total_previous_price || 0) ),
       })),
       sub_total: Number(totalPrice || 0),
       total: Number(totalPrice || 0) + Number(shippingCost || 0),
@@ -92,6 +96,7 @@ export default function CheckoutPage() {
       payment_method_id: paymentMethodId,
     };
 
+    console.log('payload', payload);
     createOrder(payload, {
       onSuccess: (data) => {
         if (data?.message) {
@@ -100,6 +105,7 @@ export default function CheckoutPage() {
           setOpen(true);
         }
       },
+
       onError: (error) => {
         console.error(error);
       },

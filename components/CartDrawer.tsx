@@ -44,6 +44,7 @@ export default function CartDrawer({ visible, onClose }: CartDrawerProps) {
       singleQty: newQty * unit.piecesPerUnit,
       price: unit.unitPrice,
       total_price: unit.unitPrice * newQty,
+      total_previous_price: unit.unitSellingPrice * newQty,
       piecesPerUnit: unit.piecesPerUnit,
       unitLabel: unit.unitLabel,
     };
@@ -69,6 +70,7 @@ export default function CartDrawer({ visible, onClose }: CartDrawerProps) {
       singleQty: newQty * unit.piecesPerUnit,
       price: unit.unitPrice,
       total_price: unit.unitPrice * newQty,
+      total_previous_price: unit.unitSellingPrice * newQty,
       piecesPerUnit: unit.piecesPerUnit,
       unitLabel: unit.unitLabel,
     };

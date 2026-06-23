@@ -78,6 +78,8 @@ export interface OrderProduct {
   total: number;
   ecom_final_selling_price?: number;
   ecom_discount_percentage?: number;
+  pack_size_quantity?: number;
+  discount_amount?: number;
 }
 
 export interface BillingAddress {
@@ -104,6 +106,7 @@ export interface Order {
   paid_amount?: string;
   verify_status: number | null;
   delivery_status: number | null;
+  suspend_request: boolean;
   sale_products: OrderProduct[];
   payment_method?: PaymentMethod;
   billing_address?: BillingAddress;

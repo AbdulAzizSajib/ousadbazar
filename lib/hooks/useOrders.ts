@@ -54,14 +54,14 @@ interface TrackingErrorResponse {
 }
 
 export const useOrderTracking = (
-  saleCode: string | undefined | null,
+  id: string | undefined | null,
   enabled: boolean = true
 ) => {
   return useQuery<Order, Error>({
-    queryKey: ["orderTracking", saleCode],
+    queryKey: ["orderTracking", id],
     queryFn: async () => {
       const res = await axios.get(
-        `${apiBasePharma}/order/order-tracking?sale_code=${String(saleCode).trim()}`
+        `${apiBasePharma}/order/order-tracking?id=${String(id).trim()}`
       );
       const data = res.data as Order | TrackingErrorResponse;
       if (data && (data as TrackingErrorResponse).status === "error") {
@@ -71,7 +71,7 @@ export const useOrderTracking = (
       }
       return data as Order;
     },
-    enabled: enabled && !!saleCode && !!String(saleCode).trim(),
+    enabled: enabled && !!id && !!String(id).trim(),
     retry: false,
     staleTime: 30 * 1000,
   });
@@ -161,6 +161,22 @@ export const useSuspendOrder = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orderList"] });
+    },
+  });
+};
+
+export const useCancelOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation<SuspendOrderResponse, unknown, number | string>({
+    mutationFn: async (id) => {
+      const res = await axios.put(
+        `${apiBasePharma}/order/suspend-request?id=${id}`
+      );
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orderHistory"] });
+      queryClient.invalidateQueries({ queryKey: ["orderTracking"] });
     },
   });
 };

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
-import { useOrderHistory } from "@/lib/hooks/useOrders";
+import { Popconfirm } from "antd";
+import { useOrderHistory, useCancelOrder } from "@/lib/hooks/useOrders";
 
 export default function OrderHistoryPage() {
   const [phone, setPhone] = useState(() =>
@@ -44,6 +45,7 @@ export default function OrderHistoryPage() {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
   const totalSpent = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+  const { mutate: cancelOrder } = useCancelOrder();
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 py-8 md:py-12 relative overflow-hidden">
@@ -227,13 +229,46 @@ export default function OrderHistoryPage() {
                           #{order.sale_code}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-center">
                         <p className="text-white/60 text-[10px] font-semibold uppercase tracking-widest mb-0.5">
                           Order Date
                         </p>
                         <p className="text-white text-sm md:text-base font-semibold">
                           {formatDate(order.created_at || order.sale_date)}
                         </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/order-tracking?id=${order.id}`}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-[#012068] hover:bg-[#012068] hover:text-white hover:border-[#012068] active:scale-95 transition-all"
+                        >
+                          <Icon icon="mdi:crosshairs-gps" className="w-3.5 h-3.5" />
+                          Track
+                        </Link>
+                        {order.suspend_request ? (
+                          <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-100 text-xs font-semibold text-amber-700 border border-amber-200">
+                            <Icon icon="mdi:clock-outline" className="w-3.5 h-3.5" />
+                            Cancellation Requested
+                          </span>
+                        ) : order.verify_status === 0 ? (
+                          <Popconfirm
+                            title="Cancel this order?"
+                            description="Are you sure you want to cancel this order? This action cannot be undone."
+                            okText="Yes, Cancel"
+                            cancelText="No"
+                            okButtonProps={{ danger: true }}
+                            placement="bottomRight"
+                            onConfirm={() => cancelOrder(order.id)}
+                          >
+                            <button
+                              type="button"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 border border-red-300 text-xs font-semibold text-red-600 hover:bg-red-100 active:scale-95 transition-all"
+                            >
+                              <Icon icon="mdi:close-circle-outline" className="w-3.5 h-3.5" />
+                              Cancel
+                            </button>
+                          </Popconfirm>
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -267,53 +302,86 @@ export default function OrderHistoryPage() {
                     </span>
                   </button>
 
-                  {/* Products (collapsible) */}
+                  {/* Products + address (collapsible) */}
                   {isOpen && (
                     <ul className="divide-y divide-gray-50 border-t border-gray-100">
-                      {order.products?.map((product, i) => (
-                        <li
-                          key={i}
-                          className="px-5 md:px-6 py-3.5 flex items-center justify-between gap-3 hover:bg-gray-50/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center ring-1 ring-gray-100">
-                              <Icon
-                                icon="mdi:pill"
-                                className="w-5 h-5 text-[#012068]/60"
-                              />
+                      {order.products?.map((product, i) => {
+                        const qty = product.total_quantity || product.quantity || 1;
+                        const mrpTotal = Number(product.total || 0);
+                        const discountAmt = Number(product.discount_amount || 0);
+                        const discountedTotal = mrpTotal - discountAmt;
+                        const hasDiscount = discountAmt > 0.01;
+                        return (
+                          <li
+                            key={i}
+                            className="px-5 md:px-6 py-3.5 flex items-center justify-between gap-3 hover:bg-gray-50/50 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center ring-1 ring-gray-100">
+                                <Icon icon="mdi:pill" className="w-5 h-5 text-[#012068]/60" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-gray-900 truncate">
+                                  {product.name || product.product_name}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                  Qty: {qty}
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-gray-900 truncate">
-                                {product.name || product.product_name}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-0.5">
-                                Qty: {product.quantity} × ৳
-                                {Number(product.price).toFixed(2)}
-                              </p>
+                            <div className="text-right whitespace-nowrap tabular-nums">
+                              {hasDiscount && (
+                                <p className="text-xs text-gray-400 line-through">৳ {mrpTotal.toFixed(2)}</p>
+                              )}
+                              <p className="text-sm font-bold text-gray-900">৳ {discountedTotal.toFixed(2)}</p>
                             </div>
-                          </div>
-                          <p className="text-sm font-bold text-gray-900 whitespace-nowrap tabular-nums">
-                            ৳ {Number(product.total).toFixed(2)}
-                          </p>
-                        </li>
-                      ))}
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
 
+                  {/* Address (collapsible) */}
+                  {isOpen && order.billing_address && (
+                    <div className="px-5 md:px-6 py-3.5 border-t border-gray-100 flex items-start gap-2">
+                      <Icon icon="mdi:map-marker-outline" className="w-4 h-4 text-[#012068] mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-gray-800">{order.billing_address.full_name}</p>
+                        <p className="text-xs text-gray-500">{order.billing_address.address}</p>
+                        <p className="text-xs text-gray-500">{order.billing_address.mobile}</p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Footer */}
-                  <div className="px-5 md:px-6 py-3.5 bg-gradient-to-r from-[#012068]/5 via-[#13a89e]/5 to-transparent flex items-center justify-between border-t border-gray-100">
-                    <span className="text-sm font-bold text-gray-900">Total</span>
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg md:text-xl font-bold text-[#012068] tabular-nums">
-                        ৳ {Number(order.total).toFixed(2)}
-                      </span>
-                      <Link
-                        href={`/order-tracking?sale_code=${order.sale_code}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-[#012068] hover:bg-[#012068] hover:text-white hover:border-[#012068] active:scale-95 transition-all"
-                      >
-                        <Icon icon="mdi:crosshairs-gps" className="w-3.5 h-3.5" />
-                        Track
-                      </Link>
+                  <div className="px-5 md:px-6 py-3.5 bg-gradient-to-r from-[#012068]/5 via-[#13a89e]/5 to-transparent border-t border-gray-100">
+                    {(() => {
+                      const mrpTotal = (order.products || []).reduce((s, p) => s + Number(p.total || 0), 0);
+                      const discountTotal = (order.products || []).reduce((s, p) => s + Number(p.discount_amount || 0), 0);
+                      const hasDiscount = discountTotal > 0.01;
+                      return (
+                        <div className="space-y-1 mb-2">
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>Subtotal (MRP)</span>
+                            <span className="tabular-nums">৳ {mrpTotal.toFixed(2)}</span>
+                          </div>
+                          {hasDiscount && (
+                            <div className="flex justify-between text-xs text-red-500">
+                              <span>Discount applied</span>
+                              <span className="tabular-nums">-৳ {discountTotal.toFixed(2)}</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-gray-900">Total</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg md:text-xl font-bold text-[#012068] tabular-nums">
+                          ৳ {Number(order.total).toFixed(2)}
+                        </span>
+                        
+                      </div>
                     </div>
                   </div>
                 </div>

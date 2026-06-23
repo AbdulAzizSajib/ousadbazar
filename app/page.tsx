@@ -60,7 +60,7 @@ export default function HomePage() {
         <HeroCarousel />
       </div>
 
-      <div className="mt-4 md:mt-6 bg-gradient-to-b from-[#FFFFFF] to-[#EAEBF4] shadow-lg border-t border-gray-200 rounded-lg border">
+      {/* <div className="mt-4 md:mt-6 bg-gradient-to-b from-[#FFFFFF] to-[#EAEBF4] shadow-lg border-t border-gray-200 rounded-lg border">
         <div className="flex flex-wrap md:flex-nowrap items-center">
           <div className="w-1/2 md:flex-1 flex items-center gap-2 sm:gap-3 px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6">
             <Truck className="text-[#012068] shrink-0 w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10" />
@@ -133,7 +133,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <CategoryCarousel />
+      <CategoryCarousel /> */}
 
       <div className="flex items-end justify-between gap-3 mt-10 md:mt-16 mb-5 md:mb-7">
         <div className="flex items-center gap-3">
