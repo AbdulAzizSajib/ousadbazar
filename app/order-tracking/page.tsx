@@ -560,14 +560,16 @@ function OrderTrackingContent() {
               </div>
             )}
             {/* Download Invoice */}
-            <button
-              type="button"
-              onClick={() => printInvoice(orderStatus)}
-              className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#012068] text-white font-semibold rounded-2xl hover:bg-[#012068]/90 active:scale-[0.98] shadow-lg shadow-[#012068]/20 transition-all"
-            >
-              <Icon icon="mdi:file-download-outline" className="w-5 h-5" />
-              Download Invoice
-            </button>
+            {!orderStatus.suspend_request && (
+              <button
+                type="button"
+                onClick={() => printInvoice(orderStatus)}
+                className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#012068] text-white font-semibold rounded-2xl hover:bg-[#012068]/90 active:scale-[0.98] shadow-lg shadow-[#012068]/20 transition-all"
+              >
+                <Icon icon="mdi:file-download-outline" className="w-5 h-5" />
+                Download Invoice
+              </button>
+            )}
           </div>
         )}
       </div>
