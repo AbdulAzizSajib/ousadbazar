@@ -238,17 +238,24 @@ export default function OrderHistoryPage() {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Link
-                          href={`/order-tracking?id=${order.id}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-[#012068] hover:bg-[#012068] hover:text-white hover:border-[#012068] active:scale-95 transition-all"
-                        >
-                          <Icon icon="mdi:crosshairs-gps" className="w-3.5 h-3.5" />
-                          Track
-                        </Link>
+                        {order.suspend_request ? (
+                          <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 border border-gray-200 text-xs font-semibold text-gray-400 cursor-not-allowed">
+                            <Icon icon="mdi:crosshairs-gps" className="w-3.5 h-3.5" />
+                            Track
+                          </span>
+                        ) : (
+                          <Link
+                            href={`/order-tracking?id=${order.id}`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-[#012068] hover:bg-[#012068] hover:text-white hover:border-[#012068] active:scale-95 transition-all"
+                          >
+                            <Icon icon="mdi:crosshairs-gps" className="w-3.5 h-3.5" />
+                            Track
+                          </Link>
+                        )}
                         {order.suspend_request ? (
                           <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-100 text-xs font-semibold text-amber-700 border border-amber-200">
                             <Icon icon="mdi:clock-outline" className="w-3.5 h-3.5" />
-                            Cancellation Requested
+                            Order Cancel
                           </span>
                         ) : order.verify_status === 0 ? (
                           <Popconfirm
