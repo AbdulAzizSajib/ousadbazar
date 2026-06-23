@@ -343,17 +343,24 @@ function OrderTrackingContent() {
                     <Icon icon="mdi:information-outline" className="w-4 h-4" />
                     Current Status
                   </span>
-                  <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ring-1 ring-inset ${getStatusBadgeClass(
-                      orderStatus.delivery_status
-                    )}`}
-                  >
-                    <Icon
-                      icon={getStatusIcon(orderStatus.delivery_status)}
-                      className="w-3.5 h-3.5"
-                    />
-                    {getStatusText(orderStatus.delivery_status)}
-                  </span>
+                  {orderStatus.suspend_request ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ring-1 ring-inset bg-red-50 text-red-700 ring-red-200">
+                      <Icon icon="mdi:close-circle-outline" className="w-3.5 h-3.5" />
+                      Cancelled
+                    </span>
+                  ) : (
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ring-1 ring-inset ${getStatusBadgeClass(
+                        orderStatus.delivery_status
+                      )}`}
+                    >
+                      <Icon
+                        icon={getStatusIcon(orderStatus.delivery_status)}
+                        className="w-3.5 h-3.5"
+                      />
+                      {getStatusText(orderStatus.delivery_status)}
+                    </span>
+                  )}
                 </div>
                 <div className="px-5 md:px-6 py-4 flex items-center justify-between">
                   <span className="flex items-center gap-2 text-sm text-gray-500">
@@ -377,7 +384,7 @@ function OrderTrackingContent() {
             </div>
 
             {/* Progress Timeline */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+            {!orderStatus.suspend_request && <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
               <div className="flex items-center gap-2 mb-6">
                 <span className="block w-1 h-5 rounded-full bg-gradient-to-b from-[#5360A7] to-[#012068]" />
                 <h3 className="text-sm md:text-base font-bold text-gray-900">
@@ -442,7 +449,7 @@ function OrderTrackingContent() {
                   })}
                 </div>
               </div>
-            </div>
+            </div>}
 
             {/* Products */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
