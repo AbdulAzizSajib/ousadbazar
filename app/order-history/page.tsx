@@ -17,7 +17,6 @@ export default function OrderHistoryPage() {
       ? localStorage.getItem("mobile")?.replace(/^88/, "") || ""
       : ""
   );
-  const [expanded, setExpanded] = useState<Record<string | number, boolean>>({});
 
   const {
     data: orders = [],
@@ -41,8 +40,42 @@ export default function OrderHistoryPage() {
       day: "numeric",
     });
 
-  const toggleExpand = (id: string | number) =>
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const getStatusText = (status: number | null) =>
+    (
+      {
+        null: "Processing",
+        1: "Store Arrived",
+        2: "On The Way",
+        3: "Delivered",
+        4: "Not Reachable",
+        5: "Not Received",
+      } as Record<string, string>
+    )[String(status)] || "Processing";
+
+  const getStatusBadgeClass = (status: number | null) =>
+    (
+      {
+        null: "bg-blue-50 text-blue-700 ring-blue-200",
+        1: "bg-amber-50 text-amber-700 ring-amber-200",
+        2: "bg-orange-50 text-orange-700 ring-orange-200",
+        3: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+        4: "bg-red-50 text-red-700 ring-red-200",
+        5: "bg-red-50 text-red-700 ring-red-200",
+      } as Record<string, string>
+    )[String(status)] || "bg-blue-50 text-blue-700 ring-blue-200";
+
+  const getStatusIcon = (status: number | null) =>
+    (
+      {
+        null: "mdi:clock-outline",
+        1: "mdi:storefront-outline",
+        2: "mdi:truck-fast-outline",
+        3: "mdi:check-circle",
+        4: "mdi:phone-off-outline",
+        5: "mdi:alert-circle-outline",
+      } as Record<string, string>
+    )[String(status)] || "mdi:clock-outline";
 
   const totalSpent = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
   const { mutate: cancelOrder } = useCancelOrder();
@@ -51,21 +84,14 @@ export default function OrderHistoryPage() {
     <section className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 py-8 md:py-12 relative overflow-hidden">
 
 
-      <div className="container mx-auto px-4 max-w-3xl relative">
+      <div className="container mx-auto px-4  relative">
         {/* Header */}
         <div className="text-center mb-8 md:mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-[#012068] to-[#5360A7] mb-4 shadow-lg shadow-[#012068]/25 rotate-3 hover:rotate-0 transition-transform duration-300">
-            <Icon
-              icon="mdi:clipboard-text-clock-outline"
-              className="w-9 h-9 md:w-10 md:h-10 text-white"
-            />
-          </div>
+         
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Order History
           </h1>
-          <p className="text-sm md:text-base text-gray-500 max-w-md mx-auto">
-            Enter your phone number to view all your past orders
-          </p>
+         
         </div>
 
         {/* Search form */}
@@ -74,7 +100,7 @@ export default function OrderHistoryPage() {
             e.preventDefault();
             fetchHistory();
           }}
-          className="relative bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 p-2 mb-6 md:mb-8 flex items-center gap-2"
+          className="relative hidden bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 p-2 mb-6 md:mb-8 flex items-center gap-2"
         >
           <div className="relative flex-1">
             <Icon
@@ -209,187 +235,127 @@ export default function OrderHistoryPage() {
         {!isLoading && orders.length > 0 && (
           <div className="space-y-4 animate-fade-in">
             {orders.map((order) => {
-              const isOpen = expanded[order.id] ?? false;
-              const itemCount = order.products?.length ?? 0;
+              const items = order.sale_products ?? order.products ?? [];
+              const itemCount = items.length;
               return (
                 <div
                   key={order.id}
-                  className="bg-white rounded-2xl shadow-sm hover:shadow-md border border-gray-100 overflow-hidden transition-all duration-200"
+                  className="group bg-white rounded-2xl shadow-sm hover:shadow-lg hover:shadow-gray-200/60 border border-gray-100 overflow-hidden transition-all duration-300"
                 >
-                  {/* Gradient header */}
-                  <div className="relative bg-gradient-to-br from-[#012068] via-[#1a3585] to-[#5360A7] px-5 md:px-6 py-4 overflow-hidden">
-                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#13a89e]/10 rounded-full blur-2xl" />
-                    <div className="relative flex items-center justify-between flex-wrap gap-3">
-                      <div>
-                        <p className="text-white/60 text-[10px] font-semibold uppercase tracking-widest mb-0.5">
-                          Order Code
-                        </p>
-                        <p className="text-white text-lg md:text-xl font-bold tracking-tight">
-                          #{order.sale_code}
-                        </p>
+                  {/* Top row: order id + status */}
+                  <div className="flex items-start justify-between gap-3 px-5 md:px-6 pt-5 pb-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#012068] to-[#5360A7] flex items-center justify-center flex-shrink-0 shadow-md shadow-[#012068]/20">
+                        <Icon icon="mdi:package-variant-closed" className="w-5 h-5 text-white" />
                       </div>
-                      <div className="text-center">
-                        <p className="text-white/60 text-[10px] font-semibold uppercase tracking-widest mb-0.5">
-                          Order Date
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+                          Order #{order.id}
                         </p>
-                        <p className="text-white text-sm md:text-base font-semibold">
+                        <p className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                          <Icon icon="mdi:calendar-blank-outline" className="w-3.5 h-3.5 text-gray-400" />
                           {formatDate(order.created_at || order.sale_date)}
+                          <span className="text-gray-300">·</span>
+                          <span className="text-gray-500 font-medium">
+                            {itemCount} {itemCount === 1 ? "item" : "items"}
+                          </span>
                         </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {order.suspend_request ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 border border-gray-200 text-xs font-semibold text-gray-400 cursor-not-allowed">
-                            <Icon icon="mdi:crosshairs-gps" className="w-3.5 h-3.5" />
-                            Track
-                          </span>
-                        ) : (
-                          <Link
-                            href={`/order-tracking?id=${order.id}`}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-[#012068] hover:bg-[#012068] hover:text-white hover:border-[#012068] active:scale-95 transition-all"
-                          >
-                            <Icon icon="mdi:crosshairs-gps" className="w-3.5 h-3.5" />
-                            Track
-                          </Link>
-                        )}
-                        {order.suspend_request ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-100 text-xs font-semibold text-amber-700 border border-amber-200">
-                            <Icon icon="mdi:clock-outline" className="w-3.5 h-3.5" />
-                            Order Cancel
-                          </span>
-                        ) : order.verify_status === 0 ? (
-                          <Popconfirm
-                            title="Cancel this order?"
-                            description="Are you sure you want to cancel this order? This action cannot be undone."
-                            okText="Yes, Cancel"
-                            cancelText="No"
-                            okButtonProps={{ danger: true }}
-                            placement="bottomRight"
-                            onConfirm={() => cancelOrder(order.id)}
-                          >
-                            <button
-                              type="button"
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 border border-red-300 text-xs font-semibold text-red-600 hover:bg-red-100 active:scale-95 transition-all"
-                            >
-                              <Icon icon="mdi:close-circle-outline" className="w-3.5 h-3.5" />
-                              Cancel
-                            </button>
-                          </Popconfirm>
-                        ) : null}
                       </div>
                     </div>
+                    {order.suspend_request ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ring-inset bg-red-50 text-red-700 ring-red-200 flex-shrink-0">
+                        <Icon icon="mdi:close-circle-outline" className="w-3 h-3" />
+                        Cancelled
+                      </span>
+                    ) : (
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ring-inset flex-shrink-0 ${getStatusBadgeClass(
+                          order.delivery_status
+                        )}`}
+                      >
+                        <Icon icon={getStatusIcon(order.delivery_status)} className="w-3 h-3" />
+                        {getStatusText(order.delivery_status)}
+                      </span>
+                    )}
                   </div>
 
-                  {/* Meta row */}
-                  <button
-                    type="button"
-                    onClick={() => toggleExpand(order.id)}
-                    className="w-full px-5 md:px-6 py-3 flex items-center justify-between gap-3 text-left hover:bg-gray-50/60 transition-colors"
-                  >
-                    <span className="inline-flex items-center gap-2 text-sm text-gray-600">
-                      <Icon
-                        icon="mdi:package-variant-closed"
-                        className="w-4 h-4 text-[#012068]"
-                      />
-                      <span className="font-semibold text-gray-800">
-                        {itemCount}
-                      </span>
-                      <span className="text-gray-500">
-                        {itemCount === 1 ? "item" : "items"}
-                      </span>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold text-[#012068]">
-                      {isOpen ? "Hide Details" : "View Details"}
-                      <Icon
-                        icon="mdi:chevron-down"
-                        className={`w-4 h-4 transition-transform duration-200 ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </span>
-                  </button>
-
-                  {/* Products + address (collapsible) */}
-                  {isOpen && (
-                    <ul className="divide-y divide-gray-50 border-t border-gray-100">
-                      {order.products?.map((product, i) => {
-                        const qty = product.total_quantity || product.quantity || 1;
-                        const mrpTotal = Number(product.total || 0);
-                        const discountAmt = Number(product.discount_amount || 0);
-                        const discountedTotal = mrpTotal - discountAmt;
-                        const hasDiscount = discountAmt > 0.01;
-                        return (
-                          <li
-                            key={i}
-                            className="px-5 md:px-6 py-3.5 flex items-center justify-between gap-3 hover:bg-gray-50/50 transition-colors"
-                          >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center ring-1 ring-gray-100">
-                                <Icon icon="mdi:pill" className="w-5 h-5 text-[#012068]/60" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-gray-900 truncate">
-                                  {product.name || product.product_name}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-0.5">
-                                  Qty: {qty}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="text-right whitespace-nowrap tabular-nums">
-                              {hasDiscount && (
-                                <p className="text-xs text-gray-400 line-through">৳ {mrpTotal.toFixed(2)}</p>
-                              )}
-                              <p className="text-sm font-bold text-gray-900">৳ {discountedTotal.toFixed(2)}</p>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-
-                  {/* Address (collapsible) */}
-                  {isOpen && order.billing_address && (
-                    <div className="px-5 md:px-6 py-3.5 border-t border-gray-100 flex items-start gap-2">
+                  {/* Shipping address */}
+                  {order.billing_address && (
+                    <div className="mx-5 md:mx-6 mb-4 rounded-xl bg-gray-50/80 border border-gray-100 px-3.5 py-3 flex items-start gap-2.5">
                       <Icon icon="mdi:map-marker-outline" className="w-4 h-4 text-[#012068] mt-0.5 flex-shrink-0" />
                       <div className="min-w-0">
                         <p className="text-xs font-semibold text-gray-800">{order.billing_address.full_name}</p>
-                        <p className="text-xs text-gray-500">{order.billing_address.address}</p>
-                        <p className="text-xs text-gray-500">{order.billing_address.mobile}</p>
+                        <p className="text-xs text-gray-500 leading-relaxed">{order.billing_address.address}</p>
+                        <p className="inline-flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+                          <Icon icon="mdi:phone-outline" className="w-3 h-3" />
+                          {order.billing_address.mobile}
+                        </p>
                       </div>
                     </div>
                   )}
 
-                  {/* Footer */}
-                  <div className="px-5 md:px-6 py-3.5 bg-gradient-to-r from-[#012068]/5 via-[#13a89e]/5 to-transparent border-t border-gray-100">
+                  {/* Price breakdown */}
+                  <div className="px-5 md:px-6 pb-4">
                     {(() => {
-                      const mrpTotal = (order.products || []).reduce((s, p) => s + Number(p.total || 0), 0);
-                      const discountTotal = (order.products || []).reduce((s, p) => s + Number(p.discount_amount || 0), 0);
+                      const mrpTotal = items.reduce((s, p) => s + Number(p.total || 0), 0);
+                      const discountTotal = items.reduce((s, p) => s + Number(p.discount_amount || 0), 0);
                       const hasDiscount = discountTotal > 0.01;
                       return (
-                        <div className="space-y-1 mb-2">
+                        <div className="space-y-1.5">
                           <div className="flex justify-between text-xs text-gray-500">
                             <span>Subtotal (MRP)</span>
                             <span className="tabular-nums">৳ {mrpTotal.toFixed(2)}</span>
                           </div>
                           {hasDiscount && (
-                            <div className="flex justify-between text-xs text-red-500">
-                              <span>Discount applied</span>
+                            <div className="flex justify-between text-xs text-emerald-600 font-medium">
+                              <span>Discount</span>
                               <span className="tabular-nums">-৳ {discountTotal.toFixed(2)}</span>
                             </div>
                           )}
+                          <div className="flex items-center justify-between pt-2 mt-1 border-t border-dashed border-gray-200">
+                            <span className="text-sm font-bold text-gray-900">Total</span>
+                            <span className="text-lg md:text-xl font-bold text-[#012068] tabular-nums">
+                              ৳ {Number(order.total).toFixed(2)}
+                            </span>
+                          </div>
                         </div>
                       );
                     })()}
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-gray-900">Total</span>
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg md:text-xl font-bold text-[#012068] tabular-nums">
-                          ৳ {Number(order.total).toFixed(2)}
-                        </span>
-                        
-                      </div>
-                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 px-5 md:px-6 py-3 border-t border-gray-100 bg-gray-50/40">
+                    <Link
+                      href={`/order-tracking?id=${order.id}`}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#012068] text-white text-xs font-semibold hover:bg-[#012068]/90 active:scale-95 shadow-sm shadow-[#012068]/20 transition-all"
+                    >
+                      <Icon icon="mdi:crosshairs-gps" className="w-4 h-4" />
+                      Track Order
+                    </Link>
+                    {order.suspend_request ? (
+                      <span className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-amber-50 text-xs font-semibold text-amber-700 border border-amber-200">
+                        <Icon icon="mdi:clock-outline" className="w-3.5 h-3.5" />
+                        Cancel Requested
+                      </span>
+                    ) : order.verify_status === 0 ? (
+                      <Popconfirm
+                        title="Cancel this order?"
+                        description="Are you sure you want to cancel this order? This action cannot be undone."
+                        okText="Yes, Cancel"
+                        cancelText="No"
+                        okButtonProps={{ danger: true }}
+                        placement="topRight"
+                        onConfirm={() => cancelOrder(order.id)}
+                      >
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-white border border-red-300 text-xs font-semibold text-red-600 hover:bg-red-50 active:scale-95 transition-all"
+                        >
+                          <Icon icon="mdi:close-circle-outline" className="w-3.5 h-3.5" />
+                          Cancel
+                        </button>
+                      </Popconfirm>
+                    ) : null}
                   </div>
                 </div>
               );

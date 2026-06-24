@@ -42,7 +42,7 @@ function OrderTrackingContent() {
     { label: "Order Placed", icon: "mdi:receipt-text-outline" },
     { label: "Store Arrived", icon: "mdi:storefront-outline" },
     { label: "On The Way", icon: "mdi:truck-fast-outline" },
-    { label: "Delivered", icon: "mdi:home-check-outline" },
+    { label: "Delivered", icon: "mdi:truck-check-outline" },
   ];
 
   const trackOrder = () => {
@@ -187,24 +187,16 @@ function OrderTrackingContent() {
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 py-8 md:py-12 relative overflow-hidden">
+    <section className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 py-8 relative overflow-hidden">
     
 
-      <div className="container mx-auto px-4 max-w-3xl relative">
+      <div className="container mx-auto px-4 relative">
         {/* Header */}
-        <div className="text-center mb-8 md:mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-[#012068] to-[#5360A7] mb-4 shadow-lg shadow-[#012068]/25 rotate-3 hover:rotate-0 transition-transform duration-300">
-            <Icon
-              icon="mdi:package-variant-closed"
-              className="w-9 h-9 md:w-10 md:h-10 text-white"
-            />
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+        <div className="mb-2">
+        {/* <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Track Your Order
-          </h1>
-          <p className="text-sm md:text-base text-gray-500 max-w-md mx-auto">
-            Enter your order code below to see real-time delivery updates
-          </p>
+        </h1> */}
+          
         </div>
 
         {/* Search form */}
@@ -288,138 +280,101 @@ function OrderTrackingContent() {
         {/* Order details */}
         {!isLoading && orderStatus && (
           <div className="space-y-5 animate-fade-in">
-            {/* Order Summary Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="relative bg-gradient-to-br from-[#012068] via-[#1a3585] to-[#5360A7] px-5 md:px-6 py-5 overflow-hidden">
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#13a89e]/10 rounded-full blur-2xl" />
-                <div className="relative flex items-center justify-between flex-wrap gap-4">
-                  <div>
-                    <p className="text-white/60 text-[10px] md:text-xs font-semibold uppercase tracking-widest mb-1">
-                      Order Code
-                    </p>
-                    <p className="text-white text-xl md:text-2xl font-bold tracking-tight">
-                      #{orderStatus.sale_code}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-white/60 text-[10px] md:text-xs font-semibold uppercase tracking-widest mb-1">
-                      Order Date
-                    </p>
-                    <p className="text-white text-sm md:text-base font-semibold">
-                      {formatDate(orderStatus.sale_date)}
-                    </p>
-                  </div>
-                  {orderStatus.suspend_request ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-100 text-xs font-semibold text-amber-700 border border-amber-200">
-                      <Icon icon="mdi:clock-outline" className="w-3.5 h-3.5" />
-                      Order Cancel
+            {/* Compact order header */}
+            <div className="flex items-center justify-between flex-wrap gap-3 bg-white rounded-2xl shadow-sm border border-gray-100 px-5 md:px-6 py-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#012068] to-[#5360A7] flex items-center justify-center flex-shrink-0 shadow-md shadow-[#012068]/20">
+                  <Icon icon="mdi:package-variant-closed" className="w-5 h-5 text-white" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+                    Order Code
+                  </p>
+                  <p className="text-base md:text-lg font-bold text-gray-900 truncate">
+                    #{orderStatus.id}
+                    <span className="ml-2 text-xs font-medium text-gray-400">
+                      · {formatDate(orderStatus.sale_date)}
                     </span>
-                  ) : orderStatus.verify_status === 0 ? (
-                    <Popconfirm
-                      title="Cancel this order?"
-                      description="Are you sure you want to cancel this order? This action cannot be undone."
-                      okText="Yes, Cancel"
-                      cancelText="No"
-                      okButtonProps={{ danger: true }}
-                      placement="bottomRight"
-                      onConfirm={() => cancelOrder(orderStatus.id)}
-                    >
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 border border-red-300 text-xs font-semibold text-red-600 hover:bg-red-100 active:scale-95 transition-all"
-                      >
-                        <Icon icon="mdi:close-circle-outline" className="w-3.5 h-3.5" />
-                        Cancel Order
-                      </button>
-                    </Popconfirm>
-                  ) : null}
+                  </p>
                 </div>
               </div>
-
-              <div className="divide-y divide-gray-100">
-                <div className="px-5 md:px-6 py-4 flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm text-gray-500">
-                    <Icon icon="mdi:information-outline" className="w-4 h-4" />
-                    Current Status
-                  </span>
-                  {orderStatus.suspend_request ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ring-1 ring-inset bg-red-50 text-red-700 ring-red-200">
-                      <Icon icon="mdi:close-circle-outline" className="w-3.5 h-3.5" />
-                      Cancelled
-                    </span>
-                  ) : (
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ring-1 ring-inset ${getStatusBadgeClass(
-                        orderStatus.delivery_status
-                      )}`}
-                    >
-                      <Icon
-                        icon={getStatusIcon(orderStatus.delivery_status)}
-                        className="w-3.5 h-3.5"
-                      />
-                      {getStatusText(orderStatus.delivery_status)}
-                    </span>
-                  )}
-                </div>
-                <div className="px-5 md:px-6 py-4 flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm text-gray-500">
-                    <Icon icon="mdi:credit-card-outline" className="w-4 h-4" />
-                    Payment
-                  </span>
-                  <span className="text-sm font-semibold text-gray-800">
-                    {orderStatus.payment_method?.name}
-                  </span>
-                </div>
-                <div className="px-5 md:px-6 py-4 flex items-center justify-between bg-gradient-to-r from-[#012068]/5 to-transparent">
-                  <span className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                    <Icon icon="mdi:cash-multiple" className="w-4 h-4" />
-                    Total Amount
-                  </span>
-                  <span className="text-lg md:text-xl font-bold text-[#012068] tabular-nums">
-                    ৳ {Number(orderStatus.total).toFixed(2)}
-                  </span>
-                </div>
-              </div>
+              {orderStatus.suspend_request ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ring-1 ring-inset bg-red-50 text-red-700 ring-red-200">
+                  <Icon icon="mdi:close-circle-outline" className="w-3.5 h-3.5" />
+                  Cancelled
+                </span>
+              ) : (
+                <span
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ring-1 ring-inset ${getStatusBadgeClass(
+                    orderStatus.delivery_status
+                  )}`}
+                >
+                  <Icon
+                    icon={getStatusIcon(orderStatus.delivery_status)}
+                    className="w-3.5 h-3.5"
+                  />
+                  {getStatusText(orderStatus.delivery_status)}
+                </span>
+              )}
             </div>
 
-            {/* Progress Timeline */}
-            {!orderStatus.suspend_request && <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <span className="block w-1 h-5 rounded-full bg-gradient-to-b from-[#5360A7] to-[#012068]" />
-                <h3 className="text-sm md:text-base font-bold text-gray-900">
-                  Delivery Progress
-                </h3>
+            {/* 1 — Delivery Progress (vertical timeline) */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+              <div className="flex items-center justify-between gap-2 mb-6">
+                <div className="flex items-center gap-2">
+                  <span className="block w-1 h-5 rounded-full bg-gradient-to-b from-[#5360A7] to-[#012068]" />
+                  <h3 className="text-sm md:text-base font-bold text-gray-900">
+                    Delivery Progress
+                  </h3>
+                </div>
+                {!orderStatus.suspend_request && orderStatus.verify_status === 0 && (
+                  <Popconfirm
+                    title="Cancel this order?"
+                    description="Are you sure you want to cancel this order? This action cannot be undone."
+                    okText="Yes, Cancel"
+                    cancelText="No"
+                    okButtonProps={{ danger: true }}
+                    placement="bottomRight"
+                    onConfirm={() => cancelOrder(orderStatus.id)}
+                  >
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 border border-red-300 text-xs font-semibold text-red-600 hover:bg-red-100 active:scale-95 transition-all"
+                    >
+                      <Icon icon="mdi:close-circle-outline" className="w-3.5 h-3.5" />
+                      Cancel Order
+                    </button>
+                  </Popconfirm>
+                )}
               </div>
 
-              <div className="relative">
-                {/* Background track */}
-                <div className="absolute top-5 md:top-6 left-0 right-0 h-1 bg-gray-100 rounded-full mx-6" />
-                {/* Progress fill */}
-                <div
-                  className="absolute top-5 md:top-6 left-0 h-1 bg-gradient-to-r from-[#012068] to-[#13a89e] rounded-full transition-all duration-700 ease-out mx-6"
-                  style={{
-                    width:
-                      currentStep === 0
-                        ? "0%"
-                        : `calc(${(currentStep / (steps.length - 1)) * 100}% - ${
-                            (currentStep / (steps.length - 1)) * 48
-                          }px)`,
-                  }}
-                />
-
-                <div className="relative flex items-start justify-between">
+              {orderStatus.suspend_request ? (
+                <div className="flex items-center gap-3 rounded-xl bg-red-50 border border-red-100 px-4 py-3">
+                  <Icon icon="mdi:close-circle-outline" className="w-5 h-5 text-red-500 flex-shrink-0" />
+                  <p className="text-sm text-red-700 font-medium">
+                    This order has been cancelled.
+                  </p>
+                </div>
+              ) : (
+                <ol className="relative">
                   {steps.map((step, index) => {
                     const isDone = index < currentStep;
                     const isActive = index === currentStep;
                     const isReached = index <= currentStep;
+                    const isLast = index === steps.length - 1;
                     return (
-                      <div
-                        key={index}
-                        className="flex flex-col items-center flex-1 min-w-0"
-                      >
+                      <li key={index} className="relative flex gap-4 pb-6 last:pb-0">
+                        {/* connector line */}
+                        {!isLast && (
+                          <span
+                            className={`absolute left-[19px] md:left-[23px] top-10 md:top-12 bottom-0 w-0.5 ${
+                              isDone ? "bg-gradient-to-b from-[#012068] to-[#13a89e]" : "bg-gray-100"
+                            }`}
+                          />
+                        )}
+                        {/* node */}
                         <div
-                          className={`relative w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          className={`relative z-10 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
                             isReached
                               ? "bg-gradient-to-br from-[#012068] to-[#5360A7] text-white shadow-lg shadow-[#012068]/30"
                               : "bg-white text-gray-400 ring-2 ring-gray-200"
@@ -431,27 +386,34 @@ function OrderTrackingContent() {
                           {isDone ? (
                             <Icon icon="mdi:check-bold" className="w-5 h-5" />
                           ) : (
-                            <Icon
-                              icon={step.icon}
-                              className="w-4 h-4 md:w-5 md:h-5"
-                            />
+                            <Icon icon={step.icon} className="w-4 h-4 md:w-5 md:h-5" />
                           )}
                         </div>
-                        <p
-                          className={`mt-2 text-[10px] md:text-xs font-semibold text-center leading-tight px-1 ${
-                            isReached ? "text-[#012068]" : "text-gray-400"
-                          }`}
-                        >
-                          {step.label}
-                        </p>
-                      </div>
+                        {/* label */}
+                        <div className="pt-1.5 md:pt-2.5">
+                          <p
+                            className={`text-sm font-bold leading-tight ${
+                              isReached ? "text-[#012068]" : "text-gray-400"
+                            }`}
+                          >
+                            {step.label}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {isActive
+                              ? "In progress"
+                              : isDone
+                              ? "Completed"
+                              : "Pending"}
+                          </p>
+                        </div>
+                      </li>
                     );
                   })}
-                </div>
-              </div>
-            </div>}
+                </ol>
+              )}
+            </div>
 
-            {/* Products */}
+            {/* 2 — Products */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="px-5 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -499,36 +461,21 @@ function OrderTrackingContent() {
                   );
                 })}
               </ul>
-              <div className="px-5 md:px-6 py-4 bg-gradient-to-r from-[#012068]/5 via-[#13a89e]/5 to-transparent border-t border-gray-100">
-                {(() => {
-                  const mrpTotal = (orderStatus.sale_products || []).reduce((s, p) => s + Number(p.total || 0), 0);
-                  const discountTotal = (orderStatus.sale_products || []).reduce((s, p) => s + Number(p.discount_amount || 0), 0);
-                  const hasDiscount = discountTotal > 0.01;
-                  return (
-                    <div className="space-y-1 mb-2">
-                      <div className="flex justify-between text-xs text-gray-500">
-                        <span>Subtotal (MRP)</span>
-                        <span className="tabular-nums">৳ {mrpTotal.toFixed(2)}</span>
-                      </div>
-                      {hasDiscount && (
-                        <div className="flex justify-between text-xs text-red-500">
-                          <span>Discount applied</span>
-                          <span className="tabular-nums">-৳ {discountTotal.toFixed(2)}</span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-gray-900">Total</span>
+              <div className="px-5 md:px-6 py-3.5 bg-gradient-to-r from-[#012068]/5 via-[#13a89e]/5 to-transparent border-t border-gray-100 flex items-center justify-between">
+                <span className="text-xs text-gray-500">
+                  {orderStatus.sale_products?.length || 0} item
+                  {(orderStatus.sale_products?.length || 0) === 1 ? "" : "s"}
+                </span>
+                <span className="inline-flex items-baseline gap-1.5 text-sm text-gray-700">
+                  Total
                   <span className="text-lg md:text-xl font-bold text-[#012068] tabular-nums">
                     ৳ {Number(orderStatus.total).toFixed(2)}
                   </span>
-                </div>
+                </span>
               </div>
             </div>
 
-            {/* Shipping address */}
+            {/* 3 — Shipping address */}
             {orderStatus.billing_address && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
                 <div className="flex items-center gap-2 mb-4">
@@ -559,17 +506,67 @@ function OrderTrackingContent() {
                 </div>
               </div>
             )}
-            {/* Download Invoice */}
-            {!orderStatus.suspend_request && (
-              <button
-                type="button"
-                onClick={() => printInvoice(orderStatus)}
-                className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#012068] text-white font-semibold rounded-2xl hover:bg-[#012068]/90 active:scale-[0.98] shadow-lg shadow-[#012068]/20 transition-all"
-              >
-                <Icon icon="mdi:file-download-outline" className="w-5 h-5" />
-                Download Invoice
-              </button>
-            )}
+
+            {/* 4 — Payment details */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="block w-1 h-5 rounded-full bg-gradient-to-b from-[#5360A7] to-[#012068]" />
+                <h3 className="text-sm md:text-base font-bold text-gray-900">
+                  Payment Details
+                </h3>
+              </div>
+              <div className="flex items-center justify-between gap-3 rounded-xl bg-gradient-to-r from-[#13a89e]/10 to-[#012068]/5 border border-[#13a89e]/20 px-4 py-3.5 mb-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm ring-1 ring-[#13a89e]/20">
+                    <Icon icon="mdi:cash-multiple" className="w-5 h-5 text-[#13a89e]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-900 truncate">
+                      {orderStatus.payment_method?.name || "Cash on Delivery"}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Pay with cash when your order arrives
+                    </p>
+                  </div>
+                </div>
+             
+              </div>
+              {(() => {
+                const mrpTotal = (orderStatus.sale_products || []).reduce((s, p) => s + Number(p.total || 0), 0);
+                const discountTotal = (orderStatus.sale_products || []).reduce((s, p) => s + Number(p.discount_amount || 0), 0);
+                const hasDiscount = discountTotal > 0.01;
+                return (
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-sm text-gray-500">
+                      <span>Subtotal (MRP)</span>
+                      <span className="tabular-nums">৳ {mrpTotal.toFixed(2)}</span>
+                    </div>
+                    {hasDiscount && (
+                      <div className="flex justify-between text-sm text-red-500">
+                        <span>Discount applied</span>
+                        <span className="tabular-nums">-৳ {discountTotal.toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between pt-2.5 mt-1 border-t border-dashed border-gray-200">
+                      <span className="text-sm font-bold text-gray-900">Amount Payable</span>
+                      <span className="text-lg md:text-xl font-bold text-[#012068] tabular-nums">
+                        ৳ {Number(orderStatus.total).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* 5 — Download Invoice */}
+            <button
+              type="button"
+              onClick={() => printInvoice(orderStatus)}
+              className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#012068] text-white font-semibold rounded-2xl hover:bg-[#012068]/90 active:scale-[0.98] shadow-lg shadow-[#012068]/20 transition-all"
+            >
+              <Icon icon="mdi:file-download-outline" className="w-5 h-5" />
+              Download Invoice
+            </button>
           </div>
         )}
       </div>
