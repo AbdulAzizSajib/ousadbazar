@@ -333,9 +333,9 @@ export default function OrderHistoryPage() {
                       Track Order
                     </Link>
                     {order.suspend_request ? (
-                      <span className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-amber-50 text-xs font-semibold text-amber-700 border border-amber-200">
-                        <Icon icon="mdi:clock-outline" className="w-3.5 h-3.5" />
-                        Cancel Requested
+                      <span className="items-center gap-1 px-3 py-2 rounded-lg bg-amber-50 text-xs hidden font-semibold text-amber-700 border border-amber-200">
+                        <Icon icon="material-symbols:cancel" className="w-3.5 h-3.5" />
+                         Cancelled
                       </span>
                     ) : order.verify_status === 0 ? (
                       <Popconfirm
@@ -351,8 +351,8 @@ export default function OrderHistoryPage() {
                           type="button"
                           className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-white border border-red-300 text-xs font-semibold text-red-600 hover:bg-red-50 active:scale-95 transition-all"
                         >
-                          <Icon icon="mdi:close-circle-outline" className="w-3.5 h-3.5" />
-                          Cancel
+                        
+                          Cancel Order
                         </button>
                       </Popconfirm>
                     ) : null}
