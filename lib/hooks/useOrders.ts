@@ -44,7 +44,8 @@ export const useOrderHistory = (
       return Array.isArray(res.data) ? res.data : [];
     },
     enabled: enabled && !!phone && !!String(phone).trim(),
-    staleTime: 30 * 1000,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 };
 
@@ -107,7 +108,10 @@ export const useCreateOrder = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orderList"] });
-      queryClient.invalidateQueries({ queryKey: ["orderHistory"] });
+      queryClient.invalidateQueries({
+        queryKey: ["orderHistory"],
+        refetchType: "all",
+      });
     },
   });
 };

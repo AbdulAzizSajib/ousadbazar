@@ -100,6 +100,9 @@ export default function CheckoutPage() {
     createOrder(payload, {
       onSuccess: (data) => {
         if (data?.message) {
+          if (typeof window !== "undefined" && address.mobile) {
+            localStorage.setItem("mobile", `88${address.mobile}`);
+          }
           setSaleCode(data?.saleCode || data?.sale_code || "");
           resetCart();
           setOpen(true);
