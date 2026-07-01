@@ -237,7 +237,7 @@ export default function Header({
               <div className="flex items-center space-x-3">
                 <span className="border p-2 rounded-lg flex items-center gap-2 font-semibold">
                   <Icon className="size-5 text-[#012068]" icon="material-symbols:call" />
-                  <h2>01755534991</h2>
+                  <h2>01888303266</h2>
                 </span>
 
                 <Badge
